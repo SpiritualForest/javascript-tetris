@@ -62,7 +62,7 @@ function shiftCoordinates(coordinates, direction) {
      */
     var newCoordinates = [];
     for(var i = 0; i < coordinates.length; i++) {
-        var x = coordinates[i].shift(), y = coordinates[i].shift();
+        var x = coordinates[i][0], y = coordinates[i][1];
         if (direction === D_LEFT) {
             newCoordinates.push([x-squareSize, y]);
         }

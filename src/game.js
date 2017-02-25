@@ -16,7 +16,8 @@ var K_QUIT = 81;
 function initGrid() {
     /* Initializes a grid to empty lists.
      * Each index of the grid will correspond to a "y" location,
-     * and its given subarray will corrspond to "x" locations on that particular row. */
+     * and its given subarray will corrspond to "x" locations on that particular row.
+     * gridCanvas is defined in graphics.js */
     var grid = [];
     var height = gridCanvas.height / squareSize;
     for(var i = 0; i < height; i++) {
@@ -85,7 +86,6 @@ function moveBlock(block, direction) {
             /* Collision when moving downwards.
              * This is a special scenario, because it could mean the block hit the floor,
              * or some other object, and we need to "drop" it and then create a new block. */
-
             // FIXME: dropBlock() should only be executed on automove completion or when the player presses down arrow twice in a row.
             dropBlock(block);
             return;
@@ -101,6 +101,7 @@ function moveBlock(block, direction) {
         /* FIXME: Potential bug when the updated coordinates' values are out of screen */
         block.rotations[i] = shiftCoordinates(block.rotations[i], direction);
     }
+    console.log(block);
 }
 
 function isyCollision(block) {
