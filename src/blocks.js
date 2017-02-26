@@ -2,7 +2,7 @@
  * File: blocks.js
  * Handles the block objects */
 
-// We're using the Nintendo Rotation System: http://tetris.wikia.com/wiki/Nintendo_Rotation_System?file=NESTetris-pieces.png */
+/* We're using the Nintendo Rotation System: http://tetris.wikia.com/wiki/Nintendo_Rotation_System?file=NESTetris-pieces.png */
 // I, O, J, L, T, S, Z
 
 // Block type constants
@@ -128,8 +128,8 @@ function _OBlockConstructor() {
 function _TBlockConstructor(){
     var block = {
         coordinatesMap: [
-            new Array(1, 1, 1),
-            new Array(0, 1, 0)
+            new Array(0, 1, 0),
+            new Array(1, 1, 1)
         ],
         rotationsMap: [
             // First rotation
@@ -140,8 +140,9 @@ function _TBlockConstructor(){
             ],
             // Second rotation
             [
-                new Array(0, 1, 0),
-                new Array(1, 1, 1)
+                new Array(0, 0, 0),
+                new Array(1, 1, 1),
+                new Array(0, 1, 0)
             ],
             // Third rotation
             [
@@ -151,8 +152,8 @@ function _TBlockConstructor(){
             ],
             // Fourth rotation (original form)
             [
-                new Array(1, 1, 1),
-                new Array(0, 1, 0)
+                new Array(0, 1, 0),
+                new Array(1, 1, 1)
             ]
         ],
         color: "red",
@@ -176,6 +177,7 @@ function _JBlockConstructor() {
             ],
             // Second rotation
             [
+                new Array(0, 0, 0),
                 new Array(1, 1, 1),
                 new Array(0, 0, 1)
             ],
@@ -212,6 +214,7 @@ function _LBlockConstructor() {
             ],
             // Second rotation
             [
+                new Array(0, 0, 0),
                 new Array(1, 1, 1),
                 new Array(1, 0, 0)
             ],

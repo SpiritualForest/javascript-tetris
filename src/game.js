@@ -52,8 +52,13 @@ function handleInput(ev) {
 function rotateBlock(block) {
     /* Rotates the block */
     /* FIXME: This function needs to have collision detection! */
+    var rotationCoordinates = block.rotations[block.currentRotation].slice();
+    if (isCollision(rotationCoordinates, block.grid)) {
+        /* Cannot perform the rotation */
+        return;
+    }
     deleteBlock(block);
-    block.coordinates = block.rotations[block.currentRotation];
+    block.coordinates = rotationCoordinates;
     block.currentRotation += 1;
     if (block.currentRotation === block.rotations.length) {
         /* Reset block.currentRotation back to zero, all rotations have been cycled through */
@@ -63,112 +68,62 @@ function rotateBlock(block) {
 }
 
 function moveBlock(block, direction) {
+    // FIXME: This function is currently ugly as fuck. Refactor it somewhat.
     /* Moves the block.
      * The function shiftCoordinates() is defined in blocks.js
      * deleteBlock() and drawBlock() are defined in graphics.js */
-    if ((direction === D_RIGHT) || (direction === D_LEFT)) {
-        /* x += squareSize */
-        if (isxCollision(block, direction)) {
-            /* There is a collision. */
-            return;
-        }
-    }
-    else if (direction === D_DOWN) {
-        /* y -= squareSize */
-        if (isyCollision(block)) {
-            /* Collision when moving downwards.
-             * This is a special scenario, because it could mean the block hit the floor,
-             * or some other object, and we need to "drop" it and then create a new block. */
-            // FIXME: dropBlock() should only be executed on automove completion or when the player presses down arrow twice in a row.
+    var newCoordinates = shiftCoordinates(block.coordinates.slice(), direction);
+    if (isCollision(newCoordinates, block.grid)) {
+        if (direction === D_DOWN) {
+            /* Downwards collision means that the block needs be added into the grid. */
             dropBlock(block);
-            return;
         }
+        // Since there was a collision, we do not proceed.
+        return;
     }
     /* First we delete the squares that are at the block's current coordinates.
      * Then we update the block's coordinates and draw it at the next position. */
     deleteBlock(block);
-    block.coordinates = shiftCoordinates(block.coordinates, direction)
+    block.coordinates = newCoordinates;
     drawBlock(block);
     /* Update all the block's rotation coordinates as well */
     for(var i = 0; i < block.rotations.length; i++) {
-        /* FIXME: Potential bug when the updated coordinates' values are out of screen */
-        block.rotations[i] = shiftCoordinates(block.rotations[i], direction);
+        block.rotations[i] = shiftCoordinates(block.rotations[i].slice(), direction);
     }
     console.log(block);
 }
 
-/* FIXME: the collision detection functions should take a list of coordinates
- * and check whether they collide with something in the grid, or go off grid */
-
-function isyCollision(block) {
-    /* Collision checking only for downwards movement */
-    var result = -1;
-    for(var i = 0; i < block.coordinates.length; i++) {
-        var xy = block.coordinates[i];
+function isCollision(coordinates, grid) {
+    /* Checks whether the given coordinates collide with any other coordinates
+     * that already exist in the grid, or whether they go off the grid altogether. */
+    for(let xy of coordinates) {
         var x = xy[0], y = xy[1];
-        if (block.grid.indexOf(y+squareSize) !== -1) {
-            // Row exists on the grid
-            var gridRow = getGridColumns(block.grid, y+squareSize);
-            result = gridRow.indexOf(x);
-        }
-        if ((result !== -1) || (y === (gridCanvas.height - squareSize))) {
-             /* We have a collision. */
+        /* Check y first */
+        if (y >= grid.length * squareSize) {
+            /* This one goes off limits. Abort operation */
             return true;
         }
-        // We have to reset result to -1,
-        // otherwise the if statement will always be evaluated to true.
-        result = -1;
+        /* We divide y by squareSize here because the y value is a pixel,
+         * but the grid is represented by squares, not pixels. */
+        var columns = grid.indexOf(y / squareSize);
+        if (columns !== -1) {
+            /* This y position exists in the grid. Check if it contains x. */
+            if (columns.indexOf(x) !== -1) {
+                /* Collision on grid */
+                return true;
+            }
+        }
+        /* Here we don't divide x by squareSize because we're comparing pixels rather than squares */
+        else if ((x < 0) || (x >= gridCanvas.width)) {
+            /* FIXME: We should NOT use gridCanvas here. Find another way. */
+            return true;
+        }
     }
+    /* If execution reached here, there were no collisions. */
     return false;
 }
 
-function getGridColumns(grid, y) {
-    /* The game's grid is composed of:
-     * [ y: [[x, c], [x, c], [x, c]]] where c stands for colour. */
-    var columns = [];
-    for(let xc of grid[y]) {
-        var x = xc[0];
-        columns.push(x);
-    }
-    return columns;
-}
-
-function isxCollision(block, direction) {
-    /* Collision checking only for left and right movement */
-    var result = -1;
-    for(var i = 0; i < block.coordinates.length; i++) {
-        var xy = block.coordinates[i]
-        var x = xy[0], y = xy[1];
-        if (direction === D_LEFT) {
-            /* x - squareSize */
-            if (block.grid.indexOf(y) !== -1) {
-                // This row exists in the grid.
-                result = getGridColumns(block.grid, y).indexOf(x-squareSize);
-            }
-            if ((result !== -1) || (x-squareSize < 0)) {
-                /* We have a collision. */
-                return true;
-            }
-            /* Reset result to -1, otherwise the if statement will always be true */
-            result = -1;
-        }
-        else if (direction === D_RIGHT) {
-            /* x + squareSize */
-            if (block.grid.indexOf(y) !== -1) {
-                // Row exists
-                result = getGridColumns(block.grid, y).indexOf(x+squareSize);
-            }
-            if ((result !== -1) || (x+(squareSize*2) > (gridWidth * squareSize))) {
-                /* Collision */
-                return true;
-            }
-            result = -1;
-        }
-    }
-    /* If we reached this point, there were no collisions */
-    return false;
-}
-
-function dropBlock() {
+function dropBlock(block) {
+    /* This function adds the block's coordinates to the grid. */
     return true;
 }

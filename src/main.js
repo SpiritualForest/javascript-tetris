@@ -5,7 +5,7 @@ function main() {
     /* Add an event listener for key pressed.
      * handleInput() is defined in game.js */
     gridCanvas.addEventListener("keydown", handleInput);
-    var grid = initGrid();
+    var grid = initGrid(); // Defined in game.js
     var b = getRandomBlock(); // This function is defined in blocks.js
     b.grid = grid;
     handleInput.block = b;
