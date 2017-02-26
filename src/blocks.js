@@ -201,29 +201,30 @@ function _LBlockConstructor() {
     var block = {
         coordinatesMap: [
             new Array(1, 1, 1),
-            new Array(0, 0, 1)
+            new Array(1, 0, 0)
         ],
         rotationsMap: [
             // First rotation
-            [
-                new Array(1, 1, 1),
-                new Array(1, 0, 0)
-            ],
-            // Second rotation
             [
                 new Array(0, 1, 0),
                 new Array(0, 1, 0),
                 new Array(0, 1, 1)
             ],
-            // Third rotation
+            // Second rotation
             [
                 new Array(0, 0, 1),
                 new Array(1, 1, 1)
             ],
+            // Third rotation
+            [
+                new Array(1, 1, 0),
+                new Array(0, 1, 0),
+                new Array(0, 1, 0)
+            ],
             // Original shape
             [
                 new Array(1, 1, 1),
-                new Array(0, 0, 1)
+                new Array(1, 0, 0)
             ]
         ],
         color: "pink",

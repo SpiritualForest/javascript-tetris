@@ -66,17 +66,10 @@ function moveBlock(block, direction) {
     /* Moves the block.
      * The function shiftCoordinates() is defined in blocks.js
      * deleteBlock() and drawBlock() are defined in graphics.js */
-    if (direction === D_RIGHT) {
+    if ((direction === D_RIGHT) || (direction === D_LEFT)) {
         /* x += squareSize */
         if (isxCollision(block, direction)) {
             /* There is a collision. */
-            return;
-        }
-    }
-    else if (direction === D_LEFT) {
-        /* x -= squareSize */
-        if (isxCollision(block, direction)) {
-            /* Collision */
             return;
         }
     }
@@ -103,6 +96,9 @@ function moveBlock(block, direction) {
     }
     console.log(block);
 }
+
+/* FIXME: the collision detection functions should take a list of coordinates
+ * and check whether they collide with something in the grid, or go off grid */
 
 function isyCollision(block) {
     /* Collision checking only for downwards movement */
