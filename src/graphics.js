@@ -43,8 +43,8 @@ function redrawGrid(grid) {
     /* Now loop on the grid's positions and redraw them one by one */
     for(let ypos of Object.keys(grid.positions)) {
         for(let xyc of grid.positions[ypos]) {
-            var x = xyc[0], y = parseInt(ypos), c = xyc[2];
-            drawSquare(x, y, squareSize, c);
+            var x = xyc[0], y = parseInt(ypos), color = xyc[1];
+            drawSquare(x, y, squareSize, color);
         }
     }
 }

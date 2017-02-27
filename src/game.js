@@ -12,6 +12,7 @@ var D_DOWN = 40;
 var K_PAUSE = 80;
 var K_QUIT = 81;
 /* TODO: Maybe a level-up feature? So that the player can increase the difficulty at will */
+/* TODO: Improve graphics. Make completed lines flash once or twice before deleting them and redrawing the grid. */
 
 function handleInput(ev) {
     /* Handles keyboard input */
@@ -76,7 +77,6 @@ function rotateBlock(block) {
 }
 
 function moveBlock(block, direction) {
-    // FIXME: This function is currently ugly as fuck. Refactor it somewhat.
     /* Moves the block.
      * The function shiftCoordinates() is defined in blocks.js
      * deleteBlock() and drawBlock() are defined in graphics.js */
@@ -139,6 +139,10 @@ function isCollision(coordinates, grid) {
 function isLineCompleted(grid, y) {
     /* Checks if line y on the grid is full. */
     if (grid.positions[y].length === grid.width) {
+        for(let xc of grid.positions[y].slice()) {
+            var x = xc[0];
+            drawSquare(x, y, squareSize, "white");
+        }
         return true;
     }
     else {
@@ -162,18 +166,19 @@ function dropBlock(block) {
     for(let xy of block.coordinates.slice()) {
         var x = xy.shift(), y = xy.shift();
         if (!(y in block.grid.positions) || (typeof block.grid.positions[y] === "undefined")) {
-            /* Create a new row.
+            /* This row either doesn't exist, or had its x coordinates previously cleared.
+             * We create a new array of arrays.
              * We don't check for line completion here because it's an entirely new line,
              * and therefore it can never be a completed line. */
             block.grid.positions[y] = [];
-            block.grid.positions[y].push([x, y, block.color]);
+            block.grid.positions[y].push([x, block.color]);
         }
         else {
             /* Append this x position to the y row on the grid. */
-            block.grid.positions[y].push([x, y, block.color]);
+            block.grid.positions[y].push([x, block.color]);
             if (isLineCompleted(block.grid, y)) {
                 /* Line completed */
-                removeLine(block.grid, y);
+                setTimeout(removeLine, 150, block.grid, y);
             }
         }
     }

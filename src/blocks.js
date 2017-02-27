@@ -234,7 +234,7 @@ function _LBlockConstructor() {
                 [1, 1, 1]
             ]
         ],
-        color: "pink",
+        color: "blue",
         width: 3
     };
     return block;
