@@ -41,8 +41,10 @@ function redrawGrid(grid) {
     var context = gridCanvas.getContext("2d");
     context.clearRect(0, 0, grid.width * squareSize, grid.height);
     /* Now loop on the grid's positions and redraw them one by one */
-    for(let pos in grid.positions) {
-        var x = pos[0], y = pos[1], color = pos[2];
-        drawSquare(x, y, squareSize, color);
+    for(let ypos of Object.keys(grid.positions)) {
+        for(let xyc of grid.positions[ypos]) {
+            var x = xyc[0], y = parseInt(ypos), c = xyc[2];
+            drawSquare(x, y, squareSize, c);
+        }
     }
 }

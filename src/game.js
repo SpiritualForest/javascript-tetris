@@ -13,23 +13,8 @@ var K_PAUSE = 80;
 var K_QUIT = 81;
 /* TODO: Maybe a level-up feature? So that the player can increase the difficulty at will */
 
-function initGrid() {
-    /* Initializes a grid to empty lists.
-     * Each index of the grid will correspond to a "y" location,
-     * and its given subarray will corrspond to "x" locations on that particular row.
-     * gridCanvas is defined in graphics.js */
-    var grid = [];
-    var height = gridCanvas.height / squareSize;
-    for(var i = 0; i < height; i++) {
-        grid.push([]);
-    }
-    console.log("The grid at first:");
-    console.log(grid);
-    return grid;
-}
-
 function handleInput(ev) {
-    /* Handles general input */
+    /* Handles keyboard input */
     ev = ev || window.event;
     //console.log(ev.type === 'keydown');
     var keyCode = ev.keyCode;
@@ -131,7 +116,7 @@ function isCollision(coordinates, grid) {
             /* This one goes off limits. Abort operation */
             return true;
         }
-        if ((y in grid.positions) && (grid.positions[y] !== undefined)) {
+        if ((y in grid.positions) && (typeof grid.positions[y] !== "undefined")) {
             // Row exists; Check all x positions
             for(let xc of grid.positions[y]) {
                 if (x == xc[0]) {
@@ -142,7 +127,7 @@ function isCollision(coordinates, grid) {
         }
         /* Here we multiply grid.width by squareSize because
          * the width is represented in squares, whereas x is in pixels. */
-        else if ((x < 0) || (x >= grid.width * squareSize)) {
+        if ((x < 0) || (x >= grid.width * squareSize)) {
             /* Out of bounds */
             return true;
         }
@@ -165,12 +150,10 @@ function removeLine(grid, y) {
     /* Removes the line at y from the grid's positions sub-object
      * and pushes downwards all lines above it. */
     var min = Math.min(parseInt(Object.keys(grid.positions)));
-    delete grid.positions[y];
     for(var y; y >= min; y -= squareSize) {
         grid.positions[y] = grid.positions[parseInt(y-squareSize)];
     }
-    console.log("New grid:");
-    console.log(grid);
+    delete grid.positions[min];
     redrawGrid(grid);
 }
 
@@ -178,7 +161,7 @@ function dropBlock(block) {
     /* This function adds the block's coordinates to the grid. */
     for(let xy of block.coordinates.slice()) {
         var x = xy.shift(), y = xy.shift();
-        if (!(y in block.grid.positions) || (block.grid.positions[y] === undefined)) {
+        if (!(y in block.grid.positions) || (typeof block.grid.positions[y] === "undefined")) {
             /* Create a new row.
              * We don't check for line completion here because it's an entirely new line,
              * and therefore it can never be a completed line. */
@@ -189,11 +172,9 @@ function dropBlock(block) {
             /* Append this x position to the y row on the grid. */
             block.grid.positions[y].push([x, y, block.color]);
             if (isLineCompleted(block.grid, y)) {
-                /* Check for line completion */
-                console.log("Line completed.");
+                /* Line completed */
                 removeLine(block.grid, y);
             }
         }
     }
-    console.log(block.grid);
 }
