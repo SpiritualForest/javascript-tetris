@@ -16,7 +16,7 @@ var Z = 7;
 var BLOCKS = [I, O, J, L, T, S, Z]; // For randomly spawning a block of some type
 
 function getRandomBlock() {
-    return getBlock(BLOCKS[Math.floor(Math.random() * 8)]);
+    return getBlock(BLOCKS[Math.floor(Math.random() * BLOCKS.length)]);
 }
 
 function getCenter(blockWidth, canvas) {
@@ -27,8 +27,11 @@ function getCenter(blockWidth, canvas) {
 }
 
 function convertCoordinatesMap(cmap, width) {
-    /* Converts the coordinates map into (x, y) topleft values and returns the array */
-    /* gridCanvas is defined in graphics.js */
+    /* Converts the coordinates map (cmap) into (x, y) topleft values
+     * according to the given width (which is some block's width).
+     * This function is only used when constructing a new block object.
+     * gridCanvas is defined in graphics.js. */
+      
     var coordinates = [];
     var y = 0;
     for(let columns of cmap) {
@@ -61,7 +64,8 @@ function shiftCoordinates(coordinates, direction) {
      * Those are just constants. But for purposes of reference, they're defined in game.js currently.
      */
     var newCoordinates = [];
-    for(var i = 0; i < coordinates.length; i++) {
+    var len = coordinates.length;
+    for(var i = 0; i < len; i++) {
         var x = coordinates[i][0], y = coordinates[i][1];
         if (direction === D_LEFT) {
             newCoordinates.push([x-squareSize, y]);
@@ -86,19 +90,19 @@ function _IBlockConstructor() {
     var block = {
         /* Coordinates is a list of arrays */
         coordinatesMap: [
-            new Array(1, 1, 1, 1)
+            [1, 1, 1, 1]
         ],
         /* Rotations is a list of lists of arrays.
          * Each sublist refers to one complete rotation */
         rotationsMap: [
             [ 
-                new Array(0, 0, 1, 0),
-                new Array(0, 0, 1, 0),
-                new Array(0, 0, 1, 0),
-                new Array(0, 0, 1, 0)
+                [0, 0, 1, 0],
+                [0, 0, 1, 0],
+                [0, 0, 1, 0],
+                [0, 0, 1, 0]
             ],
             [
-                new Array(1, 1, 1, 1)
+                [1, 1, 1, 1]
             ]
         ],
         color: "green",
@@ -110,13 +114,13 @@ function _IBlockConstructor() {
 function _OBlockConstructor() {
     var block = {
         coordinatesMap: [
-            new Array(1, 1),
-            new Array(1, 1)
+            [1, 1],
+            [1, 1]
         ],
         rotationsMap: [
             [
-                new Array(1, 1),
-                new Array(1, 1)
+                [1, 1],
+                [1, 1]
             ]
         ],
         color: "darkblue",
@@ -128,32 +132,32 @@ function _OBlockConstructor() {
 function _TBlockConstructor(){
     var block = {
         coordinatesMap: [
-            new Array(0, 1, 0),
-            new Array(1, 1, 1)
+            [0, 1, 0],
+            [1, 1, 1]
         ],
         rotationsMap: [
             // First rotation
             [
-                new Array(0, 1, 0),
-                new Array(1, 1, 0),
-                new Array(0, 1, 0)
+                [0, 1, 0],
+                [1, 1, 0],
+                [0, 1, 0]
             ],
             // Second rotation
             [
-                new Array(0, 0, 0),
-                new Array(1, 1, 1),
-                new Array(0, 1, 0)
+                [0, 0, 0],
+                [1, 1, 1],
+                [0, 1, 0]
             ],
             // Third rotation
             [
-                new Array(0, 1, 0),
-                new Array(0, 1, 1),
-                new Array(0, 1, 0)
+                [0, 1, 0],
+                [0, 1, 1],
+                [0, 1, 0]
             ],
             // Fourth rotation (original form)
             [
-                new Array(0, 1, 0),
-                new Array(1, 1, 1)
+                [0, 1, 0],
+                [1, 1, 1]
             ]
         ],
         color: "red",
@@ -165,32 +169,32 @@ function _TBlockConstructor(){
 function _JBlockConstructor() {
     var block = {
         coordinatesMap: [
-            new Array(1, 0, 0),
-            new Array(1, 1, 1)
+            [1, 0, 0],
+            [1, 1, 1]
         ],
         rotationsMap: [
             // First rotation
             [
-                new Array(0, 1, 0),
-                new Array(0, 1, 0),
-                new Array(1, 1, 0)
+                [0, 1, 0],
+                [0, 1, 0],
+                [1, 1, 0]
             ],
             // Second rotation
             [
-                new Array(0, 0, 0),
-                new Array(1, 1, 1),
-                new Array(0, 0, 1)
+                [0, 0, 0],
+                [1, 1, 1],
+                [0, 0, 1]
             ],
             // Third rotation
             [
-                new Array(0, 1, 1),
-                new Array(0, 1, 0),
-                new Array(0, 1, 0)
+                [0, 1, 1],
+                [0, 1, 0],
+                [0, 1, 0]
             ],
             // Original shape
             [
-                new Array(1, 0, 0),
-                new Array(1, 1, 1)
+                [1, 0, 0],
+                [1, 1, 1]
             ]
         ],
         color: "yellow",
@@ -202,32 +206,32 @@ function _JBlockConstructor() {
 function _LBlockConstructor() {
     var block = {
         coordinatesMap: [
-            new Array(0, 0, 1),
-            new Array(1, 1, 1)
+            [0, 0, 1],
+            [1, 1, 1]
         ],
         rotationsMap: [
             // First rotation
             [
-                new Array(1, 1, 0),
-                new Array(0, 1, 0),
-                new Array(0, 1, 0)
+                [1, 1, 0],
+                [0, 1, 0],
+                [0, 1, 0]
             ],
             // Second rotation
             [
-                new Array(0, 0, 0),
-                new Array(1, 1, 1),
-                new Array(1, 0, 0)
+                [0, 0, 0],
+                [1, 1, 1],
+                [1, 0, 0]
             ],
             // Third rotation
             [
-                new Array(0, 1, 0),
-                new Array(0, 1, 0),
-                new Array(0, 1, 1)
+                [0, 1, 0],
+                [0, 1, 0],
+                [0, 1, 1]
             ],
             // Original shape
             [
-                new Array(0, 0, 1),
-                new Array(1, 1, 1)
+                [0, 0, 1],
+                [1, 1, 1]
             ]
         ],
         color: "pink",
@@ -239,20 +243,20 @@ function _LBlockConstructor() {
 function _SBlockConstructor() {
     var block = {
         coordinatesMap: [
-            new Array(0, 1, 1),
-            new Array(1, 1, 0)
+            [0, 1, 1],
+            [1, 1, 0]
         ],
         rotationsMap: [
             /* First */
             [
-                new Array(0, 1, 0),
-                new Array(0, 1, 1),
-                new Array(0, 0, 1)
+                [0, 1, 0],
+                [0, 1, 1],
+                [0, 0, 1]
             ],
             /* Original */
             [
-                new Array(0, 1, 1),
-                new Array(1, 1, 0)
+                [0, 1, 1],
+                [1, 1, 0]
             ]
         ],
         color: "brown",
@@ -264,20 +268,20 @@ function _SBlockConstructor() {
 function _ZBlockConstructor() {
     var block = {
         coordinatesMap: [
-            new Array(1, 1, 0),
-            new Array(0, 1, 1)
+            [1, 1, 0],
+            [0, 1, 1]
         ],
         rotationsMap: [
             /* First */
             [
-                new Array(0, 0, 1),
-                new Array(0, 1, 1),
-                new Array(0, 1, 0)
+                [0, 0, 1],
+                [0, 1, 1],
+                [0, 1, 0]
             ],
             /* Original */
             [
-                new Array(1, 1, 0),
-                new Array(0, 1, 1)
+                [1, 1, 0],
+                [0, 1, 1]
             ]
         ],
         color: "magenta",
@@ -310,6 +314,10 @@ function getBlock(blockName) {
     }
     else if (blockName === Z) {
         block = _ZBlockConstructor();
+    }
+    else {
+        console.log("getBlock() called with invalid block type: " + blockName);
+        return;
     }
     /* Convert the block's coordinates map into actual [x,y] positions. */
     block.coordinates = convertCoordinatesMap(block.coordinatesMap, block.width);

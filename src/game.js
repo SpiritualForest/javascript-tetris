@@ -21,19 +21,30 @@ function initGrid() {
     var grid = [];
     var height = gridCanvas.height / squareSize;
     for(var i = 0; i < height; i++) {
-        grid.push(new Array());
+        grid.push([]);
     }
+    console.log("The grid at first:");
+    console.log(grid);
     return grid;
 }
 
 function handleInput(ev) {
     /* Handles general input */
     ev = ev || window.event;
+    //console.log(ev.type === 'keydown');
     var keyCode = ev.keyCode;
     console.log("key code: " + keyCode);
     if ((keyCode === D_LEFT) || (keyCode === D_RIGHT) || (keyCode === D_DOWN)) {
         /* Trying to move the block */
-        moveBlock(handleInput.block, keyCode);
+        var drop = moveBlock(handleInput.block, keyCode);
+        if (drop) {
+            dropBlock(handleInput.block);
+            var b = getRandomBlock();
+            console.log("Spawned new object.");
+            b.grid = handleInput.grid;
+            handleInput.block = b;
+            drawBlock(b);
+        }
     }
     else if (keyCode === D_ROTATE) {
         /* Rotate the block */
@@ -49,22 +60,34 @@ function handleInput(ev) {
     }
 }
 
+function automove(block) {
+    /* Automatically moves the block one step downwards.
+     * In case of a collision, calls dropBlock(),
+     * which adds the block's coordinates to the grid,
+     * and checks for line completions. */
+    var drop = moveBlock(block, D_DOWN);
+    if (drop) {
+        /* Collision occured. Drop the block. */
+        dropBlock(block);
+    }
+}
+
 function rotateBlock(block) {
     /* Rotates the block */
-    /* FIXME: This function needs to have collision detection! */
+    // TODO: Need area based collision detection. Currently we only have grid based.
     var rotationCoordinates = block.rotations[block.currentRotation].slice();
     if (isCollision(rotationCoordinates, block.grid)) {
-        /* Cannot perform the rotation */
+        /* Cannot perform the rotation due to a collision or out-of-bounds squares. */
         return;
     }
-    deleteBlock(block);
+    deleteBlock(block); // Clear the block's old squares from the screen
     block.coordinates = rotationCoordinates;
     block.currentRotation += 1;
     if (block.currentRotation === block.rotations.length) {
         /* Reset block.currentRotation back to zero, all rotations have been cycled through */
         block.currentRotation = 0;
     }
-    drawBlock(block);
+    drawBlock(block); // Draw the block's new squares
 }
 
 function moveBlock(block, direction) {
@@ -75,8 +98,13 @@ function moveBlock(block, direction) {
     var newCoordinates = shiftCoordinates(block.coordinates.slice(), direction);
     if (isCollision(newCoordinates, block.grid)) {
         if (direction === D_DOWN) {
-            /* Downwards collision means that the block needs be added into the grid. */
-            dropBlock(block);
+            /* Downwards collision means that the block possibly needs to be added into the grid.
+             * Since this function can also be called by the automove() function,
+             * we return true here to indicate that a collision occured.
+             * The user input handling function will ignore this, 
+             * but automove() will call dropBlock(), which adds the coordinates to the grid.
+             * This means that the player cannot manually cause dropBlock() to be called. */
+            return true;
         }
         // Since there was a collision, we do not proceed.
         return;
@@ -87,10 +115,10 @@ function moveBlock(block, direction) {
     block.coordinates = newCoordinates;
     drawBlock(block);
     /* Update all the block's rotation coordinates as well */
-    for(var i = 0; i < block.rotations.length; i++) {
+    var len = block.rotations.length;
+    for(var i = 0; i < len; i++) {
         block.rotations[i] = shiftCoordinates(block.rotations[i].slice(), direction);
     }
-    console.log(block);
 }
 
 function isCollision(coordinates, grid) {
@@ -99,23 +127,23 @@ function isCollision(coordinates, grid) {
     for(let xy of coordinates) {
         var x = xy[0], y = xy[1];
         /* Check y first */
-        if (y >= grid.length * squareSize) {
+        if (y >= grid.height) {
             /* This one goes off limits. Abort operation */
             return true;
         }
-        /* We divide y by squareSize here because the y value is a pixel,
-         * but the grid is represented by squares, not pixels. */
-        var columns = grid.indexOf(y / squareSize);
-        if (columns !== -1) {
-            /* This y position exists in the grid. Check if it contains x. */
-            if (columns.indexOf(x) !== -1) {
-                /* Collision on grid */
-                return true;
+        if ((y in grid.positions) && (grid.positions[y] !== undefined)) {
+            // Row exists; Check all x positions
+            for(let xc of grid.positions[y]) {
+                if (x == xc[0]) {
+                    /* Collision */
+                    return true;
+                }
             }
         }
-        /* Here we don't divide x by squareSize because we're comparing pixels rather than squares */
-        else if ((x < 0) || (x >= gridCanvas.width)) {
-            /* FIXME: We should NOT use gridCanvas here. Find another way. */
+        /* Here we multiply grid.width by squareSize because
+         * the width is represented in squares, whereas x is in pixels. */
+        else if ((x < 0) || (x >= grid.width * squareSize)) {
+            /* Out of bounds */
             return true;
         }
     }
@@ -123,7 +151,49 @@ function isCollision(coordinates, grid) {
     return false;
 }
 
+function isLineCompleted(grid, y) {
+    /* Checks if line y on the grid is full. */
+    if (grid.positions[y].length === grid.width) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+function removeLine(grid, y) {
+    /* Removes the line at y from the grid's positions sub-object
+     * and pushes downwards all lines above it. */
+    var min = Math.min(parseInt(Object.keys(grid.positions)));
+    delete grid.positions[y];
+    for(var y; y >= min; y -= squareSize) {
+        grid.positions[y] = grid.positions[parseInt(y-squareSize)];
+    }
+    console.log("New grid:");
+    console.log(grid);
+    redrawGrid(grid);
+}
+
 function dropBlock(block) {
     /* This function adds the block's coordinates to the grid. */
-    return true;
+    for(let xy of block.coordinates.slice()) {
+        var x = xy.shift(), y = xy.shift();
+        if (!(y in block.grid.positions) || (block.grid.positions[y] === undefined)) {
+            /* Create a new row.
+             * We don't check for line completion here because it's an entirely new line,
+             * and therefore it can never be a completed line. */
+            block.grid.positions[y] = [];
+            block.grid.positions[y].push([x, y, block.color]);
+        }
+        else {
+            /* Append this x position to the y row on the grid. */
+            block.grid.positions[y].push([x, y, block.color]);
+            if (isLineCompleted(block.grid, y)) {
+                /* Check for line completion */
+                console.log("Line completed.");
+                removeLine(block.grid, y);
+            }
+        }
+    }
+    console.log(block.grid);
 }

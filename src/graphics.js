@@ -6,6 +6,7 @@
  * A traditional tetris grid is composed of 22 rows (y) and 10 columns (x) */
 var gridCanvas = document.getElementById("grid");
 var gridWidth = 10; // How many squares one row can contain
+var gridHeight = gridCanvas.height; // Only required for collision detection - this is pixels
 var squareSize = gridCanvas.width / gridWidth;
 var bgColor = gridCanvas.style.backgroundColor;
 
@@ -33,4 +34,15 @@ function drawBlock(block) {
 function deleteBlock(block) {
     /* Overwrites the squares specified by the block's coordinates with the canvas' background colour */
     drawCoordinates(block.coordinates, bgColor);
+}
+
+function redrawGrid(grid) {
+    /* Clears the grid and redraws all the squares */
+    var context = gridCanvas.getContext("2d");
+    context.clearRect(0, 0, grid.width * squareSize, grid.height);
+    /* Now loop on the grid's positions and redraw them one by one */
+    for(let pos in grid.positions) {
+        var x = pos[0], y = pos[1], color = pos[2];
+        drawSquare(x, y, squareSize, color);
+    }
 }
