@@ -15,8 +15,10 @@ var S = 6;
 var Z = 7;
 var BLOCKS = [I, O, J, L, T, S, Z]; // For randomly spawning a block of some type
 
-function getRandomBlock() {
-    return getBlock(BLOCKS[Math.floor(Math.random() * BLOCKS.length)]);
+function getRandomBlock(gameObject) {
+    /* Spawns a new random block and attaches the current game object into it */
+    var b = BLOCKS[Math.floor(Math.random() * BLOCKS.length)];
+    return getBlock(b, gameObject);
 }
 
 function getCenter(blockWidth, canvas) {
@@ -290,7 +292,7 @@ function _ZBlockConstructor() {
     return block;
 }
 
-function getBlock(blockName) {
+function getBlock(blockName, gameObject) {
     /* Meta-function to create new blocks:
      * getBlock(O) returns a new "O" block */
     var block;
@@ -328,6 +330,8 @@ function getBlock(blockName) {
     for(let rmap of block.rotationsMap) {
         block.rotations.push(convertCoordinatesMap(rmap, block.width));
     }
+    /* Add the game object to the newly created block */
+    block.gameObject = gameObject;
     /* We no longer need the coordinates or rotations maps.
      * To save memory, we will delete them from our object. */
     delete block.rotationsMap;

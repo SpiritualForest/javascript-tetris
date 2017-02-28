@@ -1,24 +1,35 @@
 /* JavaScript tetris game.
  * File: main.js */
 
+/* TODO: Maybe a config file? Maybe attach this shit to an actual website */
+
 function main() {
-    /* Add an event listener for key pressed.
+    /* Add an event listener for key pressed and mouse focus.
      * handleInput() is defined in game.js */
     gridCanvas.addEventListener("keydown", handleInput);
-    var b = getRandomBlock(); // This function is defined in blocks.js
     /* Create a new grid object.
      * gridHeight and gridWidth are defined in graphics.js */
-    var grid = {
-        height: gridHeight,
-        width: gridWidth,
-        positions: {},
+    var gameObject = {
+        grid: {
+            height: gridHeight,
+            width: gridWidth,
+            positions: {},
+        },
+        gameStarted: false, // Is the game on?
+        lines: 0, // How many lines completed
+        points: 0, // How many points
+        level: 1, // Which level (drop speed)
+        blocks: [], // List of upcoming blocks
+        automoveMilliseconds: 1000, // automove delay for setTimeout()
     };
-    console.log(grid);
-    b.grid = grid;
-    handleInput.block = b;
-    handleInput.grid = grid;
-    console.log(b);
-    drawBlock(b);
+    /* Spawn 5 random blocks and add them to game.blocks */
+    for(var i = 0; i < 5; i++) {
+        gameObject.blocks.push(getRandomBlock(gameObject));
+    }
+    // Add the game object into handleInput.
+    handleInput.gameObject = gameObject;
+    //console.log(gameObject.grid.this);
+    startGame(gameObject);
 }
 
 main();

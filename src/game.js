@@ -2,8 +2,9 @@
  * File: game.js */
 
 /* TODO: MUST USE SETTIMEOUT() TO ACHIEVE NON-BLOCKING */
+/* TODO: Implement automatic movement and make the game playable. */
 
-/* Directional constants (arrow key codes for keydown event) */
+/* Directional constants (arrow key codes for keydown event; D stands for direction) */
 var D_LEFT = 37;
 var D_ROTATE = 38;
 var D_RIGHT = 39;
@@ -17,20 +18,11 @@ var K_QUIT = 81;
 function handleInput(ev) {
     /* Handles keyboard input */
     ev = ev || window.event;
-    //console.log(ev.type === 'keydown');
     var keyCode = ev.keyCode;
     console.log("key code: " + keyCode);
     if ((keyCode === D_LEFT) || (keyCode === D_RIGHT) || (keyCode === D_DOWN)) {
-        /* Trying to move the block */
-        var drop = moveBlock(handleInput.block, keyCode);
-        if (drop) {
-            dropBlock(handleInput.block);
-            var b = getRandomBlock();
-            console.log("Spawned new object.");
-            b.grid = handleInput.grid;
-            handleInput.block = b;
-            drawBlock(b);
-        }
+        /* Movement keys. */
+        moveBlock(handleInput.block, keyCode);
     }
     else if (keyCode === D_ROTATE) {
         /* Rotate the block */
@@ -42,8 +34,30 @@ function handleInput(ev) {
     }
     else if (keyCode === K_QUIT) {
         /* TODO: Quit the game */
-        console.log("Quit");
+        clearTimeout(handleInput.gameObject.timeout);
+        console.log("Game stopped");
     }
+}
+
+function startGame(gameObject) {
+    var b = gameObject.blocks.shift();
+    gameObject.gameStarted = true;
+    b.grid = gameObject.grid;
+    handleInput.block = b;
+    drawBlock(b);
+    var timeout = setTimeout(automove, gameObject.automoveMilliseconds, b);
+    gameObject.timeout = timeout;
+}
+
+function restartAutoMove(block, spawnNew) {
+    if (spawnNew) {
+        /* Get a new block */
+        block = block.gameObject.blocks.shift();
+        block.gameObject.blocks.push(getRandomBlock(block.gameObject));
+        handleInput.block = block;
+        drawBlock(block);
+    }
+    block.gameObject.timeout = setTimeout(automove, block.gameObject.automoveMilliseconds, block);
 }
 
 function automove(block) {
@@ -52,17 +66,20 @@ function automove(block) {
      * which adds the block's coordinates to the grid,
      * and checks for line completions. */
     var drop = moveBlock(block, D_DOWN);
+    var spawnNew = false;
     if (drop) {
         /* Collision occured. Drop the block. */
+        spawnNew = true;
         dropBlock(block);
     }
+    restartAutoMove(block, spawnNew);
 }
 
 function rotateBlock(block) {
     /* Rotates the block */
     // TODO: Need area based collision detection. Currently we only have grid based.
     var rotationCoordinates = block.rotations[block.currentRotation].slice();
-    if (isCollision(rotationCoordinates, block.grid)) {
+    if (isCollision(rotationCoordinates, block.gameObject.grid)) {
         /* Cannot perform the rotation due to a collision or out-of-bounds squares. */
         return;
     }
@@ -81,7 +98,7 @@ function moveBlock(block, direction) {
      * The function shiftCoordinates() is defined in blocks.js
      * deleteBlock() and drawBlock() are defined in graphics.js */
     var newCoordinates = shiftCoordinates(block.coordinates.slice(), direction);
-    if (isCollision(newCoordinates, block.grid)) {
+    if (isCollision(newCoordinates, block.gameObject.grid)) {
         if (direction === D_DOWN) {
             /* Downwards collision means that the block possibly needs to be added into the grid.
              * Since this function can also be called by the automove() function,
@@ -139,10 +156,7 @@ function isCollision(coordinates, grid) {
 function isLineCompleted(grid, y) {
     /* Checks if line y on the grid is full. */
     if (grid.positions[y].length === grid.width) {
-        for(let xc of grid.positions[y].slice()) {
-            var x = xc[0];
-            drawSquare(x, y, squareSize, "white");
-        }
+        /* TODO: Flashy graphics. Draw the line using a gradient to make it look nice before removal. */
         return true;
     }
     else {
@@ -165,20 +179,21 @@ function dropBlock(block) {
     /* This function adds the block's coordinates to the grid. */
     for(let xy of block.coordinates.slice()) {
         var x = xy.shift(), y = xy.shift();
-        if (!(y in block.grid.positions) || (typeof block.grid.positions[y] === "undefined")) {
+        if (!(y in block.gameObject.grid.positions) || (typeof block.gameObject.grid.positions[y] === "undefined")) {
             /* This row either doesn't exist, or had its x coordinates previously cleared.
              * We create a new array of arrays.
              * We don't check for line completion here because it's an entirely new line,
              * and therefore it can never be a completed line. */
-            block.grid.positions[y] = [];
-            block.grid.positions[y].push([x, block.color]);
+            block.gameObject.grid.positions[y] = [];
+            block.gameObject.grid.positions[y].push([x, block.color]);
         }
         else {
             /* Append this x position to the y row on the grid. */
-            block.grid.positions[y].push([x, block.color]);
-            if (isLineCompleted(block.grid, y)) {
+            block.gameObject.grid.positions[y].push([x, block.color]);
+            if (isLineCompleted(block.gameObject.grid, y)) {
                 /* Line completed */
-                setTimeout(removeLine, 150, block.grid, y);
+                removeLine(block.gameObject.grid, y);
+                //setTimeout(removeLine, 150, block.grid, y);
             }
         }
     }
