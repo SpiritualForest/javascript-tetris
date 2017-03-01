@@ -1,5 +1,6 @@
 /* JavaScript tetris game.
- * File: game.js */
+ * File: game.js
+ * This file contains all the game logic. */
 
 /* TODO: MUST USE SETTIMEOUT() TO ACHIEVE NON-BLOCKING */
 /* TODO: Implement automatic movement and make the game playable. */
@@ -19,14 +20,15 @@ function handleInput(ev) {
     /* Handles keyboard input */
     ev = ev || window.event;
     var keyCode = ev.keyCode;
+    var go = handleInput.gameObject;
     console.log("key code: " + keyCode);
     if ((keyCode === D_LEFT) || (keyCode === D_RIGHT) || (keyCode === D_DOWN)) {
         /* Movement keys. */
-        moveBlock(handleInput.block, keyCode);
+        go.moveBlock(keyCode);
     }
     else if (keyCode === D_ROTATE) {
         /* Rotate the block */
-        rotateBlock(handleInput.block);
+        go.rotateBlock();
     }
     else if (keyCode === K_PAUSE) {
         /* TODO: Pause the game */
@@ -34,71 +36,37 @@ function handleInput(ev) {
     }
     else if (keyCode === K_QUIT) {
         /* TODO: Quit the game */
-        clearTimeout(handleInput.gameObject.timeout);
+        clearTimeout(go.autoMoveTimer);
         console.log("Game stopped");
     }
 }
 
-function startGame(gameObject) {
-    var b = gameObject.blocks.shift();
-    gameObject.gameStarted = true;
-    b.grid = gameObject.grid;
-    handleInput.block = b;
-    drawBlock(b);
-    var timeout = setTimeout(automove, gameObject.automoveMilliseconds, b);
-    gameObject.timeout = timeout;
-}
-
-function restartAutoMove(block, spawnNew) {
-    if (spawnNew) {
-        /* Get a new block */
-        block = block.gameObject.blocks.shift();
-        block.gameObject.blocks.push(getRandomBlock(block.gameObject));
-        handleInput.block = block;
-        drawBlock(block);
-    }
-    block.gameObject.timeout = setTimeout(automove, block.gameObject.automoveMilliseconds, block);
-}
-
-function automove(block) {
-    /* Automatically moves the block one step downwards.
-     * In case of a collision, calls dropBlock(),
-     * which adds the block's coordinates to the grid,
-     * and checks for line completions. */
-    var drop = moveBlock(block, D_DOWN);
-    var spawnNew = false;
-    if (drop) {
-        /* Collision occured. Drop the block. */
-        spawnNew = true;
-        dropBlock(block);
-    }
-    restartAutoMove(block, spawnNew);
-}
-
-function rotateBlock(block) {
+function rotateBlock() {
     /* Rotates the block */
     // TODO: Need area based collision detection. Currently we only have grid based.
+    var block = this.block;
     var rotationCoordinates = block.rotations[block.currentRotation].slice();
-    if (isCollision(rotationCoordinates, block.gameObject.grid)) {
+    if (this.isCollision(rotationCoordinates)) {
         /* Cannot perform the rotation due to a collision or out-of-bounds squares. */
         return;
     }
-    deleteBlock(block); // Clear the block's old squares from the screen
+    this.deleteBlock(); // Clear the block's old squares from the screen
     block.coordinates = rotationCoordinates;
     block.currentRotation += 1;
     if (block.currentRotation === block.rotations.length) {
         /* Reset block.currentRotation back to zero, all rotations have been cycled through */
         block.currentRotation = 0;
     }
-    drawBlock(block); // Draw the block's new squares
+    this.drawBlock(); // Draw the block's new squares
 }
 
-function moveBlock(block, direction) {
+function moveBlock(direction) {
     /* Moves the block.
      * The function shiftCoordinates() is defined in blocks.js
      * deleteBlock() and drawBlock() are defined in graphics.js */
-    var newCoordinates = shiftCoordinates(block.coordinates.slice(), direction);
-    if (isCollision(newCoordinates, block.gameObject.grid)) {
+    var block = this.block;
+    var newCoordinates = this.shiftCoordinates(block.coordinates.slice(), direction);
+    if (this.isCollision(newCoordinates)) {
         if (direction === D_DOWN) {
             /* Downwards collision means that the block possibly needs to be added into the grid.
              * Since this function can also be called by the automove() function,
@@ -113,9 +81,9 @@ function moveBlock(block, direction) {
     }
     /* First we delete the squares that are at the block's current coordinates.
      * Then we update the block's coordinates and draw it at the next position. */
-    deleteBlock(block);
+    this.deleteBlock();
     block.coordinates = newCoordinates;
-    drawBlock(block);
+    this.drawBlock();
     /* Update all the block's rotation coordinates as well */
     var len = block.rotations.length;
     for(var i = 0; i < len; i++) {
@@ -123,9 +91,10 @@ function moveBlock(block, direction) {
     }
 }
 
-function isCollision(coordinates, grid) {
+function isCollision(coordinates) {
     /* Checks whether the given coordinates collide with any other coordinates
      * that already exist in the grid, or whether they go off the grid altogether. */
+    var grid = this.grid;
     for(let xy of coordinates) {
         var x = xy[0], y = xy[1];
         /* Check y first */
@@ -153,9 +122,9 @@ function isCollision(coordinates, grid) {
     return false;
 }
 
-function isLineCompleted(grid, y) {
+function isLineCompleted(y) {
     /* Checks if line y on the grid is full. */
-    if (grid.positions[y].length === grid.width) {
+    if (this.grid.positions[y].length === this.grid.width) {
         /* TODO: Flashy graphics. Draw the line using a gradient to make it look nice before removal. */
         return true;
     }
@@ -164,35 +133,37 @@ function isLineCompleted(grid, y) {
     }
 }
 
-function removeLine(grid, y) {
+function removeLine(y) {
     /* Removes the line at y from the grid's positions sub-object
      * and pushes downwards all lines above it. */
+    var grid = this.grid;
     var min = Math.min(parseInt(Object.keys(grid.positions)));
     for(var y; y >= min; y -= squareSize) {
         grid.positions[y] = grid.positions[parseInt(y-squareSize)];
     }
     delete grid.positions[min];
-    redrawGrid(grid);
+    this.redrawGrid();
 }
 
-function dropBlock(block) {
+function dropBlock() {
     /* This function adds the block's coordinates to the grid. */
+    var block = this.block, grid = this.grid;
     for(let xy of block.coordinates.slice()) {
         var x = xy.shift(), y = xy.shift();
-        if (!(y in block.gameObject.grid.positions) || (typeof block.gameObject.grid.positions[y] === "undefined")) {
+        if (!(y in grid.positions) || (typeof grid.positions[y] === "undefined")) {
             /* This row either doesn't exist, or had its x coordinates previously cleared.
              * We create a new array of arrays.
              * We don't check for line completion here because it's an entirely new line,
              * and therefore it can never be a completed line. */
-            block.gameObject.grid.positions[y] = [];
-            block.gameObject.grid.positions[y].push([x, block.color]);
+            grid.positions[y] = [];
+            grid.positions[y].push([x, block.color]);
         }
         else {
             /* Append this x position to the y row on the grid. */
-            block.gameObject.grid.positions[y].push([x, block.color]);
-            if (isLineCompleted(block.gameObject.grid, y)) {
+            grid.positions[y].push([x, block.color]);
+            if (this.isLineCompleted(y)) {
                 /* Line completed */
-                removeLine(block.gameObject.grid, y);
+                this.removeLine(y);
                 //setTimeout(removeLine, 150, block.grid, y);
             }
         }

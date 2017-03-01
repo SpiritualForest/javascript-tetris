@@ -26,19 +26,20 @@ function drawCoordinates(coordinates, color) {
     }
 }
 
-function drawBlock(block) {
+function drawBlock() {
     /* Draws a block on the grid */
-    drawCoordinates(block.coordinates, block.color);
+    drawCoordinates(this.block.coordinates, this.block.color);
 }
 
-function deleteBlock(block) {
+function deleteBlock() {
     /* Overwrites the squares specified by the block's coordinates with the canvas' background colour */
-    drawCoordinates(block.coordinates, bgColor);
+    drawCoordinates(this.block.coordinates, bgColor);
 }
 
-function redrawGrid(grid) {
+function redrawGrid() {
     /* Clears the grid and redraws all the squares */
     var context = gridCanvas.getContext("2d");
+    var grid = this.grid;
     context.clearRect(0, 0, grid.width * squareSize, grid.height);
     /* Now loop on the grid's positions and redraw them one by one */
     for(let ypos of Object.keys(grid.positions)) {

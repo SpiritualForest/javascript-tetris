@@ -6,39 +6,28 @@
 // I, O, J, L, T, S, Z
 
 // Block type constants
-var I = 1;
-var O = 2;
-var J = 3;
-var L = 4;
-var T = 5;
-var S = 6;
-var Z = 7;
 var BLOCKS = [I, O, J, L, T, S, Z]; // For randomly spawning a block of some type
 
-function getRandomBlock(gameObject) {
-    /* Spawns a new random block and attaches the current game object into it */
+/* function getRandomBlock(gameObject) {
     var b = BLOCKS[Math.floor(Math.random() * BLOCKS.length)];
     return getBlock(b, gameObject);
-}
+} */
 
-function getCenter(blockWidth, canvas) {
+function getCenter(blockWidth) {
     /* Returns the center position in <canvas> according to the given block width */
     /* squareSize is defined in graphics.js */
-    var totalSquares = canvas.width / squareSize; // Total possible amount of squares that can fit in a single line on the canvas
-    return Math.floor((totalSquares / 2) - (blockWidth / 2)) * squareSize;
+    return Math.floor((this.grid.width / 2) - (blockWidth / 2)) * squareSize;
 }
 
 function convertCoordinatesMap(cmap, width) {
     /* Converts the coordinates map (cmap) into (x, y) topleft values
      * according to the given width (which is some block's width).
-     * This function is only used when constructing a new block object.
-     * gridCanvas is defined in graphics.js. */
-      
+     * This function is only used when constructing a new block object. */
     var coordinates = [];
     var y = 0;
     for(let columns of cmap) {
         // The starting point of x is determined by the getCenter() function
-        var x = getCenter(width, gridCanvas);
+        var x = this.getCenter(width);
         for (let column of columns) {
             if (column === 0) {
                 // Skip this position.
@@ -88,7 +77,7 @@ function shiftCoordinates(coordinates, direction) {
     return newCoordinates;
 }
 
-function _IBlockConstructor() {
+function I() {
     var block = {
         /* Coordinates is a list of arrays */
         coordinatesMap: [
@@ -113,7 +102,7 @@ function _IBlockConstructor() {
     return block;
 }
 
-function _OBlockConstructor() {
+function O() {
     var block = {
         coordinatesMap: [
             [1, 1],
@@ -131,7 +120,7 @@ function _OBlockConstructor() {
     return block;
 }
 
-function _TBlockConstructor(){
+function T(){
     var block = {
         coordinatesMap: [
             [0, 1, 0],
@@ -168,7 +157,7 @@ function _TBlockConstructor(){
     return block;
 }
 
-function _JBlockConstructor() {
+function J() {
     var block = {
         coordinatesMap: [
             [1, 0, 0],
@@ -205,7 +194,7 @@ function _JBlockConstructor() {
     return block;
 }
 
-function _LBlockConstructor() {
+function L() {
     var block = {
         coordinatesMap: [
             [0, 0, 1],
@@ -242,7 +231,7 @@ function _LBlockConstructor() {
     return block;
 }
 
-function _SBlockConstructor() {
+function S() {
     var block = {
         coordinatesMap: [
             [0, 1, 1],
@@ -267,7 +256,7 @@ function _SBlockConstructor() {
     return block;
 }
 
-function _ZBlockConstructor() {
+function Z() {
     var block = {
         coordinatesMap: [
             [1, 1, 0],
@@ -292,46 +281,21 @@ function _ZBlockConstructor() {
     return block;
 }
 
-function getBlock(blockName, gameObject) {
-    /* Meta-function to create new blocks:
-     * getBlock(O) returns a new "O" block */
-    var block;
-    if (blockName === I) {
-        block = _IBlockConstructor();
-    }
-    else if (blockName === O) {
-        block = _OBlockConstructor();
-    }
-    else if (blockName === J) {
-        block = _JBlockConstructor();
-    }
-    else if (blockName === L) {
-        block = _LBlockConstructor();
-    }
-    else if (blockName === T) {
-        block = _TBlockConstructor();
-    }
-    else if (blockName === S) {
-        block = _SBlockConstructor();
-    }
-    else if (blockName === Z) {
-        block = _ZBlockConstructor();
-    }
-    else {
-        console.log("getBlock() called with invalid block type: " + blockName);
-        return;
-    }
+function getBlock() {
+    /* Meta-function to create new blocks */
+    var blockType = BLOCKS[Math.floor(Math.random() * BLOCKS.length)];
+    var block = blockType();
+    this.block = block;
     /* Convert the block's coordinates map into actual [x,y] positions. */
-    block.coordinates = convertCoordinatesMap(block.coordinatesMap, block.width);
+    block.coordinates = this.convertCoordinatesMap(block.coordinatesMap, block.width);
     /* Now convert the block's rotations map into actual [x,y] positions,
      * and push them into a rotations list-of-lists. */
     block.rotations = [];
     block.currentRotation = 0; // We stand at the first rotation
     for(let rmap of block.rotationsMap) {
-        block.rotations.push(convertCoordinatesMap(rmap, block.width));
+        block.rotations.push(this.convertCoordinatesMap(rmap, block.width));
     }
     /* Add the game object to the newly created block */
-    block.gameObject = gameObject;
     /* We no longer need the coordinates or rotations maps.
      * To save memory, we will delete them from our object. */
     delete block.rotationsMap;
