@@ -51,13 +51,13 @@ function startGame(inputFunction) {
     return gameObject;
 }
 
-function autoMove(gameObject) {
-    var drop = gameObject.moveBlock(D_DOWN);
+function autoMove() {
+    var drop = this.moveBlock(D_DOWN);
     if (drop) {
         /* We encountered a collision. Drop the block. */
-        gameObject.dropBlock();
+        this.dropBlock();
     }
-    gameObject.restartAutoMove(drop);
+    this.restartAutoMove(drop);
 }
 
 function restartAutoMove(spawnNew) {
@@ -67,15 +67,15 @@ function restartAutoMove(spawnNew) {
         this.blocks.push(this.getBlock());
     }
     this.drawBlock();
-    this.autoMoveTimer = setTimeout(this.autoMove, this.autoMoveMilliseconds, this);
+    var gameObject = this;
+    this.autoMoveTimer = setTimeout(function() { gameObject.autoMove() }, this.autoMoveMilliseconds);
 }
 
 function main() {
     gridCanvas.addEventListener("keydown", handleInput);
     var gameObject = startGame(handleInput);
-    console.log(gameObject);
     handleInput.gameObject = gameObject;
-    gameObject.autoMoveTimer = setTimeout(gameObject.autoMove, gameObject.autoMoveMilliseconds, gameObject);
+    gameObject.autoMoveTimer = setTimeout(function() { gameObject.autoMove() }, gameObject.autoMoveMilliseconds);
 }
 
 main();
