@@ -50,6 +50,7 @@ function drawNextBlock() {
         if (blockObject.type === "I") {
             /* I block is special. */
             x += 10;
+            y += 10;
         }
         ctx.fillRect(x+1, y+1, squareSize-1, squareSize-1);
     }
