@@ -162,9 +162,17 @@ function dropBlock() {
             /* Append this x position to the y row on the grid. */
             grid.positions[y].push([x, block.color]);
             if (this.isLineCompleted(y)) {
-                /* Line completed */
+                /* Line completed.
+                 * Remove it from the grid.
+                 * Increase line count by one.
+                 * Decrease the timeout for automove by 10 milliseconds. */
                 this.removeLine(y);
-                //setTimeout(removeLine, 150, block.grid, y);
+                this.lines++;
+                this.autoMoveMilliseconds -= 10;
+                if (this.lines % 10 === 0) {
+                    /* Increase the level after 10 lines */
+                    this.level++;
+                }
             }
         }
     }

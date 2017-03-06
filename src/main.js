@@ -3,7 +3,7 @@
 
 /* TODO: Maybe a config file? Maybe attach this shit to an actual website */
 
-function startGame(inputFunction) {
+function startGame() {
     /* Create a new grid object.
      * gridHeight and gridWidth are defined in graphics.js */
     var gameObject = {
@@ -25,6 +25,7 @@ function startGame(inputFunction) {
         drawBlock: drawBlock,
         deleteBlock: deleteBlock,
         redrawGrid: redrawGrid,
+        drawNextBlock: drawNextBlock,
         /* Methods from main.js (this file) */
         autoMove: autoMove,
         restartAutoMove: restartAutoMove,
@@ -38,16 +39,13 @@ function startGame(inputFunction) {
         lines: 0, // How many lines completed
         points: 0, // How many points
         level: 0, // Which level (drop speed)
-        blocks: [], // List of upcoming blocks
         autoMoveMilliseconds: 1000, // automove delay for setTimeout()
-        inputFunction: inputFunction, // Function that handles keyboard input
-        block: getBlock() // Initial block
+        /*block: getBlock(), // Initial block
+        nextblock: getBlock(), // Next block */
     };
-    /* Spawn 2 random blocks and add them to game.blocks */
-    for(var i = 0; i < 2; i++) {
-        gameObject.blocks.push(gameObject.getBlock());
-    }
+    gameObject.block = gameObject.getBlock();
     gameObject.drawBlock();
+    console.log(gameObject.block);
     return gameObject;
 }
 
@@ -63,19 +61,26 @@ function autoMove() {
 function restartAutoMove(spawnNew) {
     /* if spawnNew is true, we spawn a new block */
     if (spawnNew) {
-        this.block = this.blocks.shift();
-        this.blocks.push(this.getBlock());
+        this.block = Object.create(this.nextblock);
+        this.drawBlock();
+        this.nextblock = this.getBlock();
+        this.drawNextBlock();
     }
-    this.drawBlock();
     var gameObject = this;
     this.autoMoveTimer = setTimeout(function() { gameObject.autoMove() }, this.autoMoveMilliseconds);
 }
 
 function main() {
+    /* Position the canvases */
+    positionCanvases();
+    /* Add an event listener for keyboard input */
     gridCanvas.addEventListener("keydown", handleInput);
-    var gameObject = startGame(handleInput);
+    var gameObject = startGame();
+    gameObject.nextblock = gameObject.getBlock();
     handleInput.gameObject = gameObject;
     gameObject.autoMoveTimer = setTimeout(function() { gameObject.autoMove() }, gameObject.autoMoveMilliseconds);
+    /* Draw the next block */
+    gameObject.drawNextBlock();
 }
 
 main();

@@ -8,18 +8,13 @@
 // Block type constants
 var BLOCKS = [I, O, J, L, T, S, Z]; // For randomly spawning a block of some type
 
-/* function getRandomBlock(gameObject) {
-    var b = BLOCKS[Math.floor(Math.random() * BLOCKS.length)];
-    return getBlock(b, gameObject);
-} */
-
-function getCenter(blockWidth) {
+function getCenter(canvasWidth, blockWidth) {
     /* Returns the center position in <canvas> according to the given block width */
     /* squareSize is defined in graphics.js */
-    return Math.floor((this.grid.width / 2) - (blockWidth / 2)) * squareSize;
+    return Math.floor((canvasWidth / 2) - (blockWidth / 2)) * squareSize;
 }
 
-function convertCoordinatesMap(cmap, width) {
+function convertCoordinatesMap(cmap, canvasWidth, width) {
     /* Converts the coordinates map (cmap) into (x, y) topleft values
      * according to the given width (which is some block's width).
      * This function is only used when constructing a new block object. */
@@ -27,7 +22,7 @@ function convertCoordinatesMap(cmap, width) {
     var y = 0;
     for(let columns of cmap) {
         // The starting point of x is determined by the getCenter() function
-        var x = this.getCenter(width);
+        var x = this.getCenter(canvasWidth, width);
         for (let column of columns) {
             if (column === 0) {
                 // Skip this position.
@@ -285,21 +280,20 @@ function getBlock() {
     /* Meta-function to create new blocks */
     var blockType = BLOCKS[Math.floor(Math.random() * BLOCKS.length)];
     var block = blockType();
-    this.block = block;
     /* Convert the block's coordinates map into actual [x,y] positions. */
-    block.coordinates = this.convertCoordinatesMap(block.coordinatesMap, block.width);
+    block.coordinates = this.convertCoordinatesMap(block.coordinatesMap, this.grid.width, block.width);
     /* Now convert the block's rotations map into actual [x,y] positions,
      * and push them into a rotations list-of-lists. */
     block.rotations = [];
     block.currentRotation = 0; // We stand at the first rotation
     for(let rmap of block.rotationsMap) {
-        block.rotations.push(this.convertCoordinatesMap(rmap, block.width));
+        block.rotations.push(this.convertCoordinatesMap(rmap, this.grid.width, block.width));
     }
     /* Add the game object to the newly created block */
     /* We no longer need the coordinates or rotations maps.
      * To save memory, we will delete them from our object. */
     delete block.rotationsMap;
-    delete block.coordinatesMap;
+    //delete block.coordinatesMap;
     /* Return the constructed block object */
     return block;
 }

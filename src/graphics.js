@@ -5,10 +5,51 @@
 /* Get the canvas we're going to draw on, and set the square size according to its width.
  * A traditional tetris grid is composed of 22 rows (y) and 10 columns (x) */
 var gridCanvas = document.getElementById("grid");
+var statsCanvas = document.getElementById("stats");
+var nextBlockCanvas = document.getElementById("nextblock");
 var gridWidth = 10; // How many squares one row can contain
 var gridHeight = gridCanvas.height; // Only required for collision detection - this is pixels
 var squareSize = gridCanvas.width / gridWidth;
 var bgColor = gridCanvas.style.backgroundColor;
+
+function positionGridCanvas() {
+    /* Positions the grid canvas */
+    var y = (window.innerHeight / 2) - (gridHeight / 2);
+    var x = (window.innerWidth / 2) - (gridCanvas.width + statsCanvas.width / 2) + statsCanvas.width + 6;
+    /* Add the styles */
+    gridCanvas.style.top = y + "px";
+    gridCanvas.style.left = x + "px";
+}
+
+function positionNextBlockCanvas() {
+    /* Yes, I know this is an UGLY function name */
+    var ystr = gridCanvas.style.top;
+    var xstr = gridCanvas.style.left;
+    var y = parseInt(ystr.slice(0, ystr.length - 2)) - nextBlockCanvas.height - 4;
+    var x = parseInt(xstr.slice(0, xstr.length - 2)) + (nextBlockCanvas.width / 2);
+    nextBlockCanvas.style.top = y + "px";
+    nextBlockCanvas.style.left = x + "px";
+}
+
+function positionCanvases() {
+    /* Meta function that calls each canvas' positioning function */
+    positionGridCanvas();
+    positionNextBlockCanvas();
+}
+
+function drawNextBlock() {
+    /* Get the center x position on the next block canvas */
+    var blockObject = this.nextblock;
+    /* Make a copy of the upcoming block's coordinates */
+    var coordinates = this.convertCoordinatesMap(blockObject.coordinatesMap, nextBlockCanvas.width / squareSize, blockObject.width);
+    var ctx = nextBlockCanvas.getContext("2d");
+    ctx.clearRect(0, 0, nextBlockCanvas.width, nextBlockCanvas.height);
+    ctx.fillStyle = blockObject.color;
+    for(let xy of coordinates) {
+        var x = xy[0], y = xy[1];
+        ctx.fillRect(x+1, y+1, squareSize-1, squareSize-1);
+    }
+}
 
 function drawSquare(x, y, size, color) {
     /* Draws a square of <size>,
