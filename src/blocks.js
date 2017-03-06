@@ -92,7 +92,8 @@ function I() {
             ]
         ],
         color: "green",
-        width: 4 // Needed for positioning
+        width: 4,// Needed for positioning
+        type: "I",
     };
     return block;
 }
@@ -110,7 +111,8 @@ function O() {
             ]
         ],
         color: "darkblue",
-        width: 2
+        width: 2,
+        type: "O",
     };
     return block;
 }
@@ -147,7 +149,8 @@ function T(){
             ]
         ],
         color: "red",
-        width: 3
+        width: 3,
+        type: "T",
     };
     return block;
 }
@@ -184,7 +187,8 @@ function J() {
             ]
         ],
         color: "yellow",
-        width: 3
+        width: 3,
+        type: "J",
     };
     return block;
 }
@@ -221,7 +225,8 @@ function L() {
             ]
         ],
         color: "blue",
-        width: 3
+        width: 3,
+        type: "L",
     };
     return block;
 }
@@ -246,7 +251,8 @@ function S() {
             ]
         ],
         color: "brown",
-        width: 3
+        width: 3,
+        type: "S",
     };
     return block;
 }
@@ -271,7 +277,8 @@ function Z() {
             ]
         ],
         color: "magenta",
-        width: 3
+        width: 3,
+        type: "Z",
     };
     return block;
 }

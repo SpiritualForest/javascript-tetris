@@ -47,6 +47,10 @@ function drawNextBlock() {
     ctx.fillStyle = blockObject.color;
     for(let xy of coordinates) {
         var x = xy[0], y = xy[1];
+        if (blockObject.type === "I") {
+            /* I block is special. */
+            x += 10;
+        }
         ctx.fillRect(x+1, y+1, squareSize-1, squareSize-1);
     }
 }

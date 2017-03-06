@@ -3,6 +3,12 @@
 
 /* TODO: Maybe a config file? Maybe attach this shit to an actual website */
 
+Object.prototype.getName = function() { 
+    var funcNameRegex = /function (.{1,})\(/;
+    var results = (funcNameRegex).exec((this).constructor.toString());
+    return (results && results.length > 1) ? results[1] : "";
+};
+
 function startGame() {
     /* Create a new grid object.
      * gridHeight and gridWidth are defined in graphics.js */
