@@ -90,6 +90,7 @@ function drawStats() {
     ctx.clearRect(0, 0, statsCanvas.width, statsCanvas.height);
     /* Now we draw borders on the canvas, because there are 3 types of stats */
     var yposition = statsCanvas.height / 3;
+    var fontSize = 12;
     ctx.strokeStyle = "black"; 
     for(var i = 0; i < 2; i++) {
         ctx.moveTo(0, yposition);
@@ -98,18 +99,20 @@ function drawStats() {
         yposition += yposition;
     }
     yposition = statsCanvas.height / 3;
-    ctx.font = "12px Sans Serif";
+    ctx.font = fontSize + "px Sans Serif";
     /* fillText draws from the bottom upwards, rather than from the top downwards */
     var centerx = (statsCanvas.width / 2) - 12;
     /* First of all, we draw the stats names */
     ctx.fillStyle = "darkblue";
-    ctx.fillText("Lines: ", centerx, 14);
-    ctx.fillText("Score: ", centerx, yposition + 14);
-    ctx.fillText("Level: ", centerx, yposition * 2 + 14);
+    ctx.fillText("Lines: ", centerx, fontSize + 2);
+    ctx.fillText("Score: ", centerx, yposition + fontSize + 2);
+    ctx.fillText("Level: ", centerx, (yposition * 2) + (fontSize + 2));
+    console.log(yposition);
+    console.log((yposition * 2) + (fontSize + 2));
     /* Now let's draw the actual stats */
-    ctx.fillText(this.lines, centerx, 30);
-    ctx.fillText(this.score, centerx, yposition + 30);
-    ctx.fillText(this.level, centerx, yposition * 2 + 30);
+    ctx.fillText(this.lines, centerx, (fontSize * 2) + (fontSize / 2));
+    ctx.fillText(this.score, centerx, yposition + (fontSize * 2) + (fontSize / 2));
+    ctx.fillText(this.level, centerx, (yposition * 2) + (fontSize * 2) + (fontSize / 2));
 }
 
 function drawSquare(x, y, size, color) {
