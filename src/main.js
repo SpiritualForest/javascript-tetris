@@ -26,6 +26,7 @@ function startGame() {
         deleteBlock: deleteBlock,
         redrawGrid: redrawGrid,
         drawNextBlock: drawNextBlock,
+        drawStats: drawStats,
         /* Methods from main.js (this file) */
         autoMove: autoMove,
         restartAutoMove: restartAutoMove,
@@ -35,17 +36,16 @@ function startGame() {
             width: gridWidth,
             positions: {},
         },
-        gameStarted: false, // Is the game on?
+        gameStarted: true, // Is the game on?
         lines: 0, // How many lines completed
-        points: 0, // How many points
+        score: 0, // How many points
         level: 0, // Which level (drop speed)
         autoMoveMilliseconds: 1000, // automove delay for setTimeout()
-        /*block: getBlock(), // Initial block
-        nextblock: getBlock(), // Next block */
     };
+    /* We have to set the game blocks here, since "this" points to the window */
     gameObject.block = gameObject.getBlock();
+    gameObject.nextblock = gameObject.getBlock();
     gameObject.drawBlock();
-    console.log(gameObject.block);
     return gameObject;
 }
 
@@ -76,11 +76,11 @@ function main() {
     /* Add an event listener for keyboard input */
     gridCanvas.addEventListener("keydown", handleInput);
     var gameObject = startGame();
-    gameObject.nextblock = gameObject.getBlock();
     handleInput.gameObject = gameObject;
     gameObject.autoMoveTimer = setTimeout(function() { gameObject.autoMove() }, gameObject.autoMoveMilliseconds);
     /* Draw the next block */
     gameObject.drawNextBlock();
+    gameObject.drawStats();
 }
 
 main();

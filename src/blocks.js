@@ -91,7 +91,7 @@ function I() {
                 [1, 1, 1, 1]
             ]
         ],
-        color: "green",
+        color: "cyan",
         width: 4,// Needed for positioning
         type: "I",
     };
@@ -110,7 +110,7 @@ function O() {
                 [1, 1]
             ]
         ],
-        color: "darkblue",
+        color: "yellow",
         width: 2,
         type: "O",
     };
@@ -148,7 +148,7 @@ function T(){
                 [1, 1, 1]
             ]
         ],
-        color: "red",
+        color: "purple",
         width: 3,
         type: "T",
     };
@@ -186,7 +186,7 @@ function J() {
                 [1, 1, 1]
             ]
         ],
-        color: "yellow",
+        color: "blue",
         width: 3,
         type: "J",
     };
@@ -224,7 +224,7 @@ function L() {
                 [1, 1, 1]
             ]
         ],
-        color: "blue",
+        color: "orange",
         width: 3,
         type: "L",
     };
@@ -250,7 +250,7 @@ function S() {
                 [1, 1, 0]
             ]
         ],
-        color: "brown",
+        color: "lime",
         width: 3,
         type: "S",
     };
@@ -276,7 +276,7 @@ function Z() {
                 [0, 1, 1]
             ]
         ],
-        color: "magenta",
+        color: "red",
         width: 3,
         type: "Z",
     };

@@ -2,9 +2,6 @@
  * File: game.js
  * This file contains all the game logic. */
 
-/* TODO: MUST USE SETTIMEOUT() TO ACHIEVE NON-BLOCKING */
-/* TODO: Implement automatic movement and make the game playable. */
-
 /* Directional constants (arrow key codes for keydown event; D stands for direction) */
 var D_LEFT = 37;
 var D_ROTATE = 38;
@@ -15,6 +12,9 @@ var K_PAUSE = 80;
 var K_QUIT = 81;
 /* TODO: Maybe a level-up feature? So that the player can increase the difficulty at will */
 /* TODO: Improve graphics. Make completed lines flash once or twice before deleting them and redrawing the grid. */
+
+/* TODO: Must implement a game over scenario when the blocks reach the top.
+ * Do this by checking the grid's y positions. */
 
 function handleInput(ev) {
     /* Handles keyboard input */
@@ -161,6 +161,7 @@ function dropBlock() {
         else {
             /* Append this x position to the y row on the grid. */
             grid.positions[y].push([x, block.color]);
+            var linecount = this.lines;
             if (this.isLineCompleted(y)) {
                 /* Line completed.
                  * Remove it from the grid.
@@ -174,6 +175,15 @@ function dropBlock() {
                     this.level++;
                 }
             }
+            var linediff = this.lines - linecount;
+            if (linediff >= 1) {
+                /* Scoring after line completion */
+                var scoreMultiplication = [40, 100, 300, 1200];
+                this.score += scoreMultiplication[linediff-1] * (this.level + 1);
+            }
         }
     }
+    /* Scoring based on grid cells soft dropped */
+    this.score += (y + squareSize) / squareSize;
+    this.drawStats();
 }

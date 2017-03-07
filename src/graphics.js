@@ -26,15 +26,36 @@ function positionNextBlockCanvas() {
     var ystr = gridCanvas.style.top;
     var xstr = gridCanvas.style.left;
     var y = parseInt(ystr.slice(0, ystr.length - 2)) - nextBlockCanvas.height - 4;
-    var x = parseInt(xstr.slice(0, xstr.length - 2)) + (nextBlockCanvas.width / 2);
+    var x = parseInt(xstr.slice(0, xstr.length - 2)) + (nextBlockCanvas.width / 2) - 3;
     nextBlockCanvas.style.top = y + "px";
     nextBlockCanvas.style.left = x + "px";
+}
+
+function positionStatsCanvas() {
+    var ystr = gridCanvas.style.top;
+    var xstr = gridCanvas.style.left;
+    var y = parseInt(ystr.slice(0, ystr.length - 2));
+    var x = parseInt(xstr.slice(0, xstr.length - 2)) - statsCanvas.width - 4;
+    statsCanvas.style.top = y + "px";
+    statsCanvas.style.left = x + "px";
+    /* Now let's also draw lines to divide between the stats borders.
+     * There are 3 types of stats, so we need two border lines. */
+    var yposition = statsCanvas.height / 3;
+    var ctx = statsCanvas.getContext("2d");
+    ctx.strokeStyle = "black";
+    for(var i = 0; i < 2; i++) {
+        ctx.moveTo(0, yposition);
+        ctx.lineTo(statsCanvas.width, yposition);
+        ctx.stroke();
+        yposition += yposition;
+    }
 }
 
 function positionCanvases() {
     /* Meta function that calls each canvas' positioning function */
     positionGridCanvas();
     positionNextBlockCanvas();
+    positionStatsCanvas();
 }
 
 function drawNextBlock() {
@@ -48,12 +69,47 @@ function drawNextBlock() {
     for(let xy of coordinates) {
         var x = xy[0], y = xy[1];
         if (blockObject.type === "I") {
-            /* I block is special. */
+            /* I block needs to be pushed rightwards and downwards by 10 pixels */
             x += 10;
             y += 10;
         }
+        else if (blockObject.type === "O") {
+            /* The O block also needs to be pushed to the right by 10 pixels */
+            x += 10;
+        }
         ctx.fillRect(x+1, y+1, squareSize-1, squareSize-1);
     }
+}
+
+function drawStats() {
+    /* Draws the score, lines completed, and current level on the stats canvas.
+     * FIXME: this function is FUCKING UGLY AS FUCKING FUCK!!! REFACTOR IT ASAP!!! */
+
+    /* First of all we clear the entire canvas */
+    var ctx = statsCanvas.getContext("2d");
+    ctx.clearRect(0, 0, statsCanvas.width, statsCanvas.height);
+    /* Now we draw borders on the canvas, because there are 3 types of stats */
+    var yposition = statsCanvas.height / 3;
+    ctx.strokeStyle = "black"; 
+    for(var i = 0; i < 2; i++) {
+        ctx.moveTo(0, yposition);
+        ctx.lineTo(statsCanvas.width, yposition);
+        ctx.stroke();
+        yposition += yposition;
+    }
+    yposition = statsCanvas.height / 3;
+    ctx.font = "12px Sans Serif";
+    /* fillText draws from the bottom upwards, rather than from the top downwards */
+    var centerx = (statsCanvas.width / 2) - 12;
+    /* First of all, we draw the stats names */
+    ctx.fillStyle = "darkblue";
+    ctx.fillText("Lines: ", centerx, 14);
+    ctx.fillText("Score: ", centerx, yposition + 14);
+    ctx.fillText("Level: ", centerx, yposition * 2 + 14);
+    /* Now let's draw the actual stats */
+    ctx.fillText(this.lines, centerx, 30);
+    ctx.fillText(this.score, centerx, yposition + 30);
+    ctx.fillText(this.level, centerx, yposition * 2 + 30);
 }
 
 function drawSquare(x, y, size, color) {
