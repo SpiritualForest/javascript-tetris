@@ -3,7 +3,7 @@
 
 /* TODO: Maybe a config file? Maybe attach this shit to an actual website */
 
-function startGame() {
+function startGame(inputFunction) {
     /* Create a new grid object.
      * gridHeight and gridWidth are defined in graphics.js */
     var gameObject = {
@@ -14,6 +14,7 @@ function startGame() {
         isCollision: isCollision,
         isLineCompleted: isLineCompleted,
         removeLine: removeLine,
+        endGame: endGame,
         /* Methods from blocks.js */
         shiftCoordinates: shiftCoordinates,
         getBlock: getBlock,
@@ -42,18 +43,28 @@ function startGame() {
         level: 0, // Which level (drop speed)
         autoMoveMilliseconds: 1000, // automove delay for setTimeout()
     };
+    /* Add our newly created game object as a field of the input function */
+    inputFunction.gameObject = gameObject;
     /* We have to set the game blocks here, since "this" points to the window */
     gameObject.block = gameObject.getBlock();
     gameObject.nextblock = gameObject.getBlock();
+    /* Draw the current and the next blocks in their respective canvases */
     gameObject.drawBlock();
-    return gameObject;
+    gameObject.drawNextBlock();
+    /* Clear the grid */
+    gameObject.redrawGrid();
+    /* Draw the stats */
+    gameObject.drawStats();
+    /* Initiate the automatic movement timer */
+    gameObject.autoMoveTimer = setTimeout(function() { gameObject.autoMove() }, gameObject.autoMoveMilliseconds);
 }
 
 function autoMove() {
     var drop = this.moveBlock(D_DOWN);
     if (drop) {
         /* We encountered a collision. Drop the block. */
-        this.dropBlock();
+        var gameOver = this.dropBlock();
+        if (gameOver) { return; }
     }
     this.restartAutoMove(drop);
 }
@@ -75,12 +86,6 @@ function main() {
     positionCanvases();
     /* Add an event listener for keyboard input */
     gridCanvas.addEventListener("keydown", handleInput);
-    var gameObject = startGame();
-    handleInput.gameObject = gameObject;
-    gameObject.autoMoveTimer = setTimeout(function() { gameObject.autoMove() }, gameObject.autoMoveMilliseconds);
-    /* Draw the next block */
-    gameObject.drawNextBlock();
-    gameObject.drawStats();
 }
 
 main();

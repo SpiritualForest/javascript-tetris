@@ -107,8 +107,6 @@ function drawStats() {
     ctx.fillText("Lines: ", centerx, fontSize + 2);
     ctx.fillText("Score: ", centerx, yposition + fontSize + 2);
     ctx.fillText("Level: ", centerx, (yposition * 2) + (fontSize + 2));
-    console.log(yposition);
-    console.log((yposition * 2) + (fontSize + 2));
     /* Now let's draw the actual stats */
     ctx.fillText(this.lines, centerx, (fontSize * 2) + (fontSize / 2));
     ctx.fillText(this.score, centerx, yposition + (fontSize * 2) + (fontSize / 2));

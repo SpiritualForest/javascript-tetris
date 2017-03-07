@@ -10,6 +10,7 @@ var D_DOWN = 40;
 /* Other input constants */
 var K_PAUSE = 80;
 var K_QUIT = 81;
+var K_STARTNEW = 13;
 /* TODO: Maybe a level-up feature? So that the player can increase the difficulty at will */
 /* TODO: Improve graphics. Make completed lines flash once or twice before deleting them and redrawing the grid. */
 
@@ -22,22 +23,36 @@ function handleInput(ev) {
     var keyCode = ev.keyCode;
     var go = handleInput.gameObject;
     console.log("key code: " + keyCode);
-    if ((keyCode === D_LEFT) || (keyCode === D_RIGHT) || (keyCode === D_DOWN)) {
-        /* Movement keys. */
-        go.moveBlock(keyCode);
+    if (keyCode === K_STARTNEW) {
+        if (typeof go === "undefined") {
+            /* First game */
+            startGame(handleInput);
+        }
+        else {
+            go.endGame();
+            startGame(handleInput);
+        }
+        return;
     }
-    else if (keyCode === D_ROTATE) {
-        /* Rotate the block */
-        go.rotateBlock();
-    }
-    else if (keyCode === K_PAUSE) {
-        /* TODO: Pause the game */
-        console.log("Pause");
-    }
-    else if (keyCode === K_QUIT) {
-        /* TODO: Quit the game */
-        clearTimeout(go.autoMoveTimer);
-        console.log("Game stopped");
+    if (go.gameStarted) {
+        /* These ones can only work if the game is in progress */
+        if ((keyCode === D_LEFT) || (keyCode === D_RIGHT) || (keyCode === D_DOWN)) {
+            /* Movement keys.
+            * FIXME: Allow soft drop */
+            drop = go.moveBlock(keyCode);
+        }
+        else if (keyCode === D_ROTATE) {
+            /* Rotate the block */
+            go.rotateBlock();
+        }
+        else if (keyCode === K_PAUSE) {
+            /* TODO: Pause the game */
+            console.log("Pause");
+        }
+        else if (keyCode === K_QUIT) {
+            /* TODO: Quit the game */
+            go.endGame();
+        }
     }
 }
 
@@ -148,6 +163,7 @@ function removeLine(y) {
 function dropBlock() {
     /* This function adds the block's coordinates to the grid. */
     var block = this.block, grid = this.grid;
+    var linecount = 0;
     for(let xy of block.coordinates.slice()) {
         var x = xy.shift(), y = xy.shift();
         if (!(y in grid.positions) || (typeof grid.positions[y] === "undefined")) {
@@ -161,7 +177,6 @@ function dropBlock() {
         else {
             /* Append this x position to the y row on the grid. */
             grid.positions[y].push([x, block.color]);
-            var linecount = this.lines;
             if (this.isLineCompleted(y)) {
                 /* Line completed.
                  * Remove it from the grid.
@@ -169,21 +184,40 @@ function dropBlock() {
                  * Decrease the timeout for automove by 10 milliseconds. */
                 this.removeLine(y);
                 this.lines++;
+                linecount++;
                 this.autoMoveMilliseconds -= 10;
                 if (this.lines % 10 === 0) {
                     /* Increase the level after 10 lines */
                     this.level++;
                 }
             }
-            var linediff = this.lines - linecount;
-            if (linediff >= 1) {
-                /* Scoring after line completion */
-                var scoreMultiplication = [40, 100, 300, 1200];
-                this.score += scoreMultiplication[linediff-1] * (this.level + 1);
-            }
         }
+    }
+    if (linecount >= 1) {
+        /* Scoring after line completion */
+        console.log(linecount);
+        var scoreMultiplication = [40, 100, 300, 1200];
+        this.score += scoreMultiplication[linecount-1] * (this.level + 1);
     }
     /* Scoring based on grid cells soft dropped */
     this.score += (y + squareSize) / squareSize;
     this.drawStats();
+    /* Check for game ending */
+    if ("0" in grid.positions) {
+        /* top row reached. End the game */
+        this.endGame();
+        return true;
+    }
+}
+
+function endGame() {
+    /* Cancel automatic movement */
+    clearTimeout(this.autoMoveTimer);
+    this.gameStarted = false;
+    /* Write "GAME OVER" in the center of the grid */
+    var ctx = gridCanvas.getContext("2d");
+    ctx.fillStyle = "white";
+    ctx.font = "30px Sans Serif";
+    var string = "GAME OVER";
+    ctx.fillText(string, (gridCanvas.width / 2) - (string.length * 10), gridCanvas.height / 2);
 }
