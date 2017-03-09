@@ -13,8 +13,9 @@ function startGame(inputFunction) {
         dropBlock: dropBlock,
         isCollision: isCollision,
         isLineCompleted: isLineCompleted,
-        removeLine: removeLine,
+        pushLines: pushLines,
         endGame: endGame,
+        clearLine: clearLine,
         /* Methods from blocks.js */
         shiftCoordinates: shiftCoordinates,
         getBlock: getBlock,
@@ -37,11 +38,16 @@ function startGame(inputFunction) {
             width: gridWidth,
             positions: {},
         },
+        /* Stats attributes */
         gameStarted: true, // Is the game on?
         lines: 0, // How many lines completed
         score: 0, // How many points
         level: 0, // Which level (drop speed)
         autoMoveMilliseconds: 1000, // automove delay for setTimeout()
+        /* Canvas contexts. We don't actively need all of them yet */
+        gridCtx: gridCanvas.getContext("2d"),
+        statsCtx: statsCanvas.getContext("2d"),
+        nextBlockCtx: nextBlockCanvas.getContext("2d"),
     };
     /* Add our newly created game object as a field of the input function */
     inputFunction.gameObject = gameObject;
@@ -50,6 +56,7 @@ function startGame(inputFunction) {
     gameObject.nextblock = gameObject.getBlock();
     /* Draw the current and the next blocks in their respective canvases */
     gameObject.drawBlock();
+    console.log("called drawBlock()");
     gameObject.drawNextBlock();
     /* Clear the grid */
     gameObject.redrawGrid();

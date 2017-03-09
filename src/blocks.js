@@ -296,11 +296,9 @@ function getBlock() {
     for(let rmap of block.rotationsMap) {
         block.rotations.push(this.convertCoordinatesMap(rmap, this.grid.width, block.width));
     }
-    /* Add the game object to the newly created block */
-    /* We no longer need the coordinates or rotations maps.
-     * To save memory, we will delete them from our object. */
+    /* We no longer need the rotations map.
+     * To save memory, we will delete it from our object. */
     delete block.rotationsMap;
-    //delete block.coordinatesMap;
     /* Return the constructed block object */
     return block;
 }

@@ -14,8 +14,16 @@ var K_STARTNEW = 13;
 /* TODO: Maybe a level-up feature? So that the player can increase the difficulty at will */
 /* TODO: Improve graphics. Make completed lines flash once or twice before deleting them and redrawing the grid. */
 
-/* TODO: Must implement a game over scenario when the blocks reach the top.
- * Do this by checking the grid's y positions. */
+/* FIXME:
+ * FIXME:
+ * FIXME:
+ * FIXME:
+ * FIXME:
+ * FIXME:
+ * FIXME:
+ * Refactor line completion method.
+ * Implement a ghost piece feature.
+ */
 
 function handleInput(ev) {
     /* Handles keyboard input */
@@ -34,7 +42,7 @@ function handleInput(ev) {
         }
         return;
     }
-    if (go.gameStarted) {
+    if ((typeof go !== "undefined") && (go.gameStarted)) {
         /* These ones can only work if the game is in progress */
         if ((keyCode === D_LEFT) || (keyCode === D_RIGHT) || (keyCode === D_DOWN)) {
             /* Movement keys.
@@ -50,7 +58,7 @@ function handleInput(ev) {
             console.log("Pause");
         }
         else if (keyCode === K_QUIT) {
-            /* TODO: Quit the game */
+            /* Quit the game */
             go.endGame();
         }
     }
@@ -140,7 +148,6 @@ function isCollision(coordinates) {
 function isLineCompleted(y) {
     /* Checks if line y on the grid is full. */
     if (this.grid.positions[y].length === this.grid.width) {
-        /* TODO: Flashy graphics. Draw the line using a gradient to make it look nice before removal. */
         return true;
     }
     else {
@@ -148,16 +155,41 @@ function isLineCompleted(y) {
     }
 }
 
-function removeLine(y) {
-    /* Removes the line at y from the grid's positions sub-object
-     * and pushes downwards all lines above it. */
-    var grid = this.grid;
-    var min = Math.min(parseInt(Object.keys(grid.positions)));
-    for(var y; y >= min; y -= squareSize) {
-        grid.positions[y] = grid.positions[parseInt(y-squareSize)];
+function pushLines(max) {
+    /* Push all lines downwards */
+    var min = Math.min(parseInt(Object.keys(this.grid.positions))); // top most line on the grid
+    /* We have to loop backwards from max towards min.
+     * If we encounter a key whose value is undefined,
+     * we set max to it and move on.
+     * If it IS defined, we copy its values to whatever key <max> is. */
+    var max = parseInt(max);
+    var step = 0;
+    for(var i = max; i >= min; i -= squareSize) {
+        var values = this.grid.positions[i];
+        if (typeof values === "undefined") {
+            /* Empty line. Increase step by squareSize */
+            step += squareSize;
+        }
+        else {
+            this.grid.positions[i+step] = values;
+            delete this.grid.positions[i];
+        }
     }
-    delete grid.positions[min];
     this.redrawGrid();
+}
+    /*var timeoutMs = 30;
+    console.log(xes);
+    var gameObject = this;
+    for(let xc of xes) {
+        var x = xc[0];
+        setTimeout(gameObject.clearLine.bind(this, x, y), timeoutMs);
+        timeoutMs += 30;
+    }
+    this.redrawGrid();*/
+
+
+function clearLine(x, y) {
+    this.gridCtx.clearRect(x, y, squareSize, squareSize);
 }
 
 function dropBlock() {
@@ -181,11 +213,11 @@ function dropBlock() {
                 /* Line completed.
                  * Remove it from the grid.
                  * Increase line count by one.
-                 * Decrease the timeout for automove by 10 milliseconds. */
-                this.removeLine(y);
+                 * Decrease the timeout for automove by 5 milliseconds */
+                delete this.grid.positions[y];
+                linecount++; // Only required for calculating the score multipliction
                 this.lines++;
-                linecount++;
-                this.autoMoveMilliseconds -= 10;
+                this.autoMoveMilliseconds -= 5;
                 if (this.lines % 10 === 0) {
                     /* Increase the level after 10 lines */
                     this.level++;
@@ -195,9 +227,9 @@ function dropBlock() {
     }
     if (linecount >= 1) {
         /* Scoring after line completion */
-        console.log(linecount);
         var scoreMultiplication = [40, 100, 300, 1200];
         this.score += scoreMultiplication[linecount-1] * (this.level + 1);
+        this.pushLines(y);
     }
     /* Scoring based on grid cells soft dropped */
     this.score += (y + squareSize) / squareSize;
