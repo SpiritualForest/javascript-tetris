@@ -54,12 +54,11 @@ function startGame(inputFunction) {
     /* We have to set the game blocks here, since "this" points to the window */
     gameObject.block = gameObject.getBlock();
     gameObject.nextblock = gameObject.getBlock();
-    /* Draw the current and the next blocks in their respective canvases */
-    gameObject.drawBlock();
-    console.log("called drawBlock()");
-    gameObject.drawNextBlock();
     /* Clear the grid */
     gameObject.redrawGrid();
+    /* Draw the current and next blocks */
+    gameObject.drawBlock();
+    gameObject.drawNextBlock();
     /* Draw the stats */
     gameObject.drawStats();
     /* Initiate the automatic movement timer */

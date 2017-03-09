@@ -14,16 +14,7 @@ var K_STARTNEW = 13;
 /* TODO: Maybe a level-up feature? So that the player can increase the difficulty at will */
 /* TODO: Improve graphics. Make completed lines flash once or twice before deleting them and redrawing the grid. */
 
-/* FIXME:
- * FIXME:
- * FIXME:
- * FIXME:
- * FIXME:
- * FIXME:
- * FIXME:
- * Refactor line completion method.
- * Implement a ghost piece feature.
- */
+/* TODO: Implement a ghost piece feature. */
 
 function handleInput(ev) {
     /* Handles keyboard input */
@@ -160,8 +151,9 @@ function pushLines(max) {
     var min = Math.min(parseInt(Object.keys(this.grid.positions))); // top most line on the grid
     /* We have to loop backwards from max towards min.
      * If we encounter a key whose value is undefined,
-     * we set max to it and move on.
-     * If it IS defined, we copy its values to whatever key <max> is. */
+     * we increase the step by squareSize.
+     * If it IS defined, we copy its values to whatever key i+step is
+     * and delete it from the grid. */
     var max = parseInt(max);
     var step = 0;
     for(var i = max; i >= min; i -= squareSize) {
@@ -195,7 +187,7 @@ function clearLine(x, y) {
 function dropBlock() {
     /* This function adds the block's coordinates to the grid. */
     var block = this.block, grid = this.grid;
-    var linecount = 0;
+    var linecount = 0, maxy = 0;
     for(let xy of block.coordinates.slice()) {
         var x = xy.shift(), y = xy.shift();
         if (!(y in grid.positions) || (typeof grid.positions[y] === "undefined")) {
@@ -215,6 +207,7 @@ function dropBlock() {
                  * Increase line count by one.
                  * Decrease the timeout for automove by 5 milliseconds */
                 delete this.grid.positions[y];
+                maxy = parseInt(y); // Required for clearing the grid
                 linecount++; // Only required for calculating the score multipliction
                 this.lines++;
                 this.autoMoveMilliseconds -= 5;
@@ -229,7 +222,7 @@ function dropBlock() {
         /* Scoring after line completion */
         var scoreMultiplication = [40, 100, 300, 1200];
         this.score += scoreMultiplication[linecount-1] * (this.level + 1);
-        this.pushLines(y);
+        this.pushLines(maxy);
     }
     /* Scoring based on grid cells soft dropped */
     this.score += (y + squareSize) / squareSize;
