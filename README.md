@@ -5,6 +5,7 @@
 
 #### Left, right, and down arrow keys move the block.
 #### Up arrow key rotates the block.
-#### Pressing "p" pauses the game (not yet developed)
-#### Pressing "q" stops the game.
-#### Pressing ENTER will start the game.
+#### Pressing "P" pauses the game.
+#### Pressing "Q" stops the game.
+#### Pressing "L" increases the level (drop speed)
+#### Pressing ENTER will restart the game.

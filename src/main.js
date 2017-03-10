@@ -15,7 +15,6 @@ function startGame(inputFunction) {
         isLineCompleted: isLineCompleted,
         pushLines: pushLines,
         endGame: endGame,
-        clearLine: clearLine,
         /* Methods from blocks.js */
         shiftCoordinates: shiftCoordinates,
         getBlock: getBlock,
@@ -29,7 +28,8 @@ function startGame(inputFunction) {
         redrawGrid: redrawGrid,
         drawNextBlock: drawNextBlock,
         drawStats: drawStats,
-        drawText: drawText,
+        drawTextOnGrid: drawTextOnGrid,
+        clearGrid: clearGrid,
         /* Methods from main.js (this file) */
         autoMove: autoMove,
         restartAutoMove: restartAutoMove,
@@ -41,6 +41,7 @@ function startGame(inputFunction) {
         },
         /* Stats attributes */
         gameStarted: true, // Is the game on?
+        paused: false,
         lines: 0, // How many lines completed
         score: 0, // How many points
         level: 0, // Which level (drop speed)
@@ -92,7 +93,7 @@ function restartAutoMove(spawnNew) {
 function main() {
     /* Position the canvases */
     positionCanvases();
-    drawText("CLICK HERE", 20);
+    drawTextOnGrid("CLICK HERE", 20);
     /* Add an event listener for keyboard input */
     gridCanvas.addEventListener("keydown", handleInput);
     gridCanvas.addEventListener("click", handleInput);

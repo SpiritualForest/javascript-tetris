@@ -2,7 +2,8 @@
  * File: game.js
  * This file contains all the game logic. */
 
-/* Directional constants (arrow key codes for keydown event; D stands for direction) */
+/* Directional constants (arrow key codes for keydown event; D stands for direction).
+ * The numbers are the ASCII values for the keys. */
 var D_LEFT = 37;
 var D_ROTATE = 38;
 var D_RIGHT = 39;
@@ -11,7 +12,8 @@ var D_DOWN = 40;
 var K_PAUSE = 80;
 var K_QUIT = 81;
 var K_RESTART = 13;
-/* TODO: Maybe a level-up feature? So that the player can increase the difficulty at will */
+var K_LEVELUP = 76;
+
 /* TODO: Improve graphics. Make completed lines flash once or twice before deleting them and redrawing the grid. */
 
 /* TODO: Implement a ghost piece feature. */
@@ -30,11 +32,16 @@ function handleInput(ev) {
     var keyCode = ev.keyCode;
     console.log("key code: " + keyCode);
     if (keyCode === K_RESTART) {
+        /* Restart the game */
         go.endGame();
         startGame(handleInput);
         return;
     }
     if ((typeof go !== "undefined") && (go.gameStarted)) {
+        if ((keyCode !== K_PAUSE) && (keyCode !== K_QUIT) && (keyCode !== K_RESTART) && (go.paused)) {
+            /* Only pause, quit, and restart keys can work while the game is paused. */
+            return;
+        }
         /* These ones can only work if the game is in progress */
         if ((keyCode === D_LEFT) || (keyCode === D_RIGHT) || (keyCode === D_DOWN)) {
             /* Movement keys.
@@ -46,12 +53,31 @@ function handleInput(ev) {
             go.rotateBlock();
         }
         else if (keyCode === K_PAUSE) {
-            /* TODO: Pause the game */
-            console.log("Pause");
+            /* Pause and unpause */
+            if (!go.paused) {
+                // Pause
+                go.paused = true;
+                clearTimeout(go.autoMoveTimer);
+                go.clearGrid();
+                go.drawTextOnGrid("PAUSE", 30);
+            }
+            else {
+                // Unpause
+                go.paused = false;
+                go.redrawGrid();
+                go.drawBlock();
+                go.restartAutoMove();
+            }
         }
         else if (keyCode === K_QUIT) {
             /* Quit the game */
             go.endGame();
+        }
+        else if (keyCode == K_LEVELUP) {
+            /* Allow the user to increase the level and drop speed */
+            go.level++;
+            go.autoMoveMilliseconds -= 80;
+            go.drawStats();
         }
     }
 }
@@ -155,7 +181,6 @@ function pushLines(max) {
      * we increase the step by squareSize.
      * If it IS defined, we copy its values to whatever key i+step is
      * and delete it from the grid. */
-    var max = parseInt(max);
     var step = 0;
     for(var i = max; i >= min; i -= squareSize) {
         var values = this.grid.positions[i];
@@ -168,22 +193,11 @@ function pushLines(max) {
             delete this.grid.positions[i];
         }
     }
+    /* redrawGrid() is defined in graphics.js */
     this.redrawGrid();
 }
-    /*var timeoutMs = 30;
-    console.log(xes);
-    var gameObject = this;
-    for(let xc of xes) {
-        var x = xc[0];
-        setTimeout(gameObject.clearLine.bind(this, x, y), timeoutMs);
-        timeoutMs += 30;
-    }
-    this.redrawGrid();*/
 
-
-function clearLine(x, y) {
-    this.gridCtx.clearRect(x, y, squareSize, squareSize);
-}
+/* TODO: Line clearing animation!!! */
 
 function dropBlock() {
     /* This function adds the block's coordinates to the grid. */
@@ -219,16 +233,17 @@ function dropBlock() {
             }
         }
     }
-    if (linecount >= 1) {
+    if (linecount > 0) {
         /* Scoring after line completion */
         var scoreMultiplication = [40, 100, 300, 1200];
         this.score += scoreMultiplication[linecount-1] * (this.level + 1) * this.previousLineCount;
-        this.pushLines(maxy);
         this.previousLineCount = linecount;
+        /* Rearrange the grid after the completed lines have been removed */
+        this.pushLines(maxy);
     }
     /* Scoring based on grid cells soft dropped */
     this.score += (y + squareSize) / squareSize;
-    this.drawStats();
+    this.drawStats(); // Defined in graphics.js
     /* Check for game ending */
     if ("0" in grid.positions) {
         /* top row reached. End the game */
@@ -241,6 +256,7 @@ function endGame() {
     /* Cancel automatic movement */
     clearTimeout(this.autoMoveTimer);
     this.gameStarted = false;
-    /* Write "GAME OVER" in the center of the grid */
-    this.drawText("GAME OVER");
+    /* Write "GAME OVER" in the center of the grid.
+     * drawText() is defined in graphics.js */
+    this.drawTextOnGrid("GAME OVER", 20);
 }

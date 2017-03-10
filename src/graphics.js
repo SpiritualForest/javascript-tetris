@@ -81,11 +81,13 @@ function drawNextBlock() {
     }
 }
 
-function drawText(string, fontSize = 30) {
+function drawTextOnGrid(string, fontSize = 30) {
+    /* Draws the given string in the center of the grid canvas.
+     * Default font size is 30 pixels. */
     var ctx = gridCanvas.getContext("2d");
     ctx.fillStyle = "white";
     ctx.font = fontSize + "px Sans Serif";
-    ctx.fillText(string, (gridCanvas.width / 2) - (string.length * (fontSize / 3)), gridCanvas.height / 2);
+    ctx.fillText(string, (gridCanvas.width / 2) - (string.length * (fontSize / 3.5)), gridCanvas.height / 2);
 }
 
 function drawStats() {
@@ -148,9 +150,8 @@ function deleteBlock() {
 
 function redrawGrid() {
     /* Clears the grid and redraws all the squares */
-    var context = gridCanvas.getContext("2d");
+    this.clearGrid();
     var grid = this.grid;
-    context.clearRect(0, 0, grid.width * squareSize, grid.height);
     /* Now loop on the grid's positions and redraw them one by one */
     for(let ypos of Object.keys(grid.positions)) {
         for(let xyc of grid.positions[ypos]) {
@@ -158,4 +159,10 @@ function redrawGrid() {
             drawSquare(x, y, squareSize, color);
         }
     }
+}
+
+function clearGrid() {
+    /* All this does is call clearRect() on the grid canvas */
+    var ctx = gridCanvas.getContext("2d");
+    ctx.clearRect(0, 0, this.grid.width * squareSize, this.grid.height);
 }
