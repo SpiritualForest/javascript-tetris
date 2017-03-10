@@ -81,6 +81,13 @@ function drawNextBlock() {
     }
 }
 
+function drawText(string, fontSize = 30) {
+    var ctx = gridCanvas.getContext("2d");
+    ctx.fillStyle = "white";
+    ctx.font = fontSize + "px Sans Serif";
+    ctx.fillText(string, (gridCanvas.width / 2) - (string.length * (fontSize / 3)), gridCanvas.height / 2);
+}
+
 function drawStats() {
     /* Draws the score, lines completed, and current level on the stats canvas.
      * FIXME: this function is FUCKING UGLY AS FUCKING FUCK!!! REFACTOR IT ASAP!!! */

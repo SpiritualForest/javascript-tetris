@@ -29,6 +29,7 @@ function startGame(inputFunction) {
         redrawGrid: redrawGrid,
         drawNextBlock: drawNextBlock,
         drawStats: drawStats,
+        drawText: drawText,
         /* Methods from main.js (this file) */
         autoMove: autoMove,
         restartAutoMove: restartAutoMove,
@@ -44,6 +45,7 @@ function startGame(inputFunction) {
         score: 0, // How many points
         level: 0, // Which level (drop speed)
         autoMoveMilliseconds: 1000, // automove delay for setTimeout()
+        previousLineCount: 1,
         /* Canvas contexts. We don't actively need all of them yet */
         gridCtx: gridCanvas.getContext("2d"),
         statsCtx: statsCanvas.getContext("2d"),
@@ -90,8 +92,10 @@ function restartAutoMove(spawnNew) {
 function main() {
     /* Position the canvases */
     positionCanvases();
+    drawText("CLICK HERE", 20);
     /* Add an event listener for keyboard input */
     gridCanvas.addEventListener("keydown", handleInput);
+    gridCanvas.addEventListener("click", handleInput);
 }
 
 main();

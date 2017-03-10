@@ -10,7 +10,7 @@ var D_DOWN = 40;
 /* Other input constants */
 var K_PAUSE = 80;
 var K_QUIT = 81;
-var K_STARTNEW = 13;
+var K_RESTART = 13;
 /* TODO: Maybe a level-up feature? So that the player can increase the difficulty at will */
 /* TODO: Improve graphics. Make completed lines flash once or twice before deleting them and redrawing the grid. */
 
@@ -19,18 +19,19 @@ var K_STARTNEW = 13;
 function handleInput(ev) {
     /* Handles keyboard input */
     ev = ev || window.event;
-    var keyCode = ev.keyCode;
     var go = handleInput.gameObject;
+    if ((ev.type === "click") && (typeof go === "undefined")) {
+        /* Start the game by clicking on the canvas.
+         * We return afterwards because we don't respond to any further mouse events.
+         * At least not at this stage of development :P */
+        startGame(handleInput);
+        return;
+    }
+    var keyCode = ev.keyCode;
     console.log("key code: " + keyCode);
-    if (keyCode === K_STARTNEW) {
-        if (typeof go === "undefined") {
-            /* First game */
-            startGame(handleInput);
-        }
-        else {
-            go.endGame();
-            startGame(handleInput);
-        }
+    if (keyCode === K_RESTART) {
+        go.endGame();
+        startGame(handleInput);
         return;
     }
     if ((typeof go !== "undefined") && (go.gameStarted)) {
@@ -205,12 +206,12 @@ function dropBlock() {
                 /* Line completed.
                  * Remove it from the grid.
                  * Increase line count by one.
-                 * Decrease the timeout for automove by 5 milliseconds */
+                 * Decrease the timeout for automove by 8 milliseconds */
                 delete this.grid.positions[y];
                 maxy = parseInt(y); // Required for clearing the grid
                 linecount++; // Only required for calculating the score multipliction
                 this.lines++;
-                this.autoMoveMilliseconds -= 5;
+                this.autoMoveMilliseconds -= 8;
                 if (this.lines % 10 === 0) {
                     /* Increase the level after 10 lines */
                     this.level++;
@@ -221,8 +222,9 @@ function dropBlock() {
     if (linecount >= 1) {
         /* Scoring after line completion */
         var scoreMultiplication = [40, 100, 300, 1200];
-        this.score += scoreMultiplication[linecount-1] * (this.level + 1);
+        this.score += scoreMultiplication[linecount-1] * (this.level + 1) * this.previousLineCount;
         this.pushLines(maxy);
+        this.previousLineCount = linecount;
     }
     /* Scoring based on grid cells soft dropped */
     this.score += (y + squareSize) / squareSize;
@@ -240,9 +242,5 @@ function endGame() {
     clearTimeout(this.autoMoveTimer);
     this.gameStarted = false;
     /* Write "GAME OVER" in the center of the grid */
-    var ctx = gridCanvas.getContext("2d");
-    ctx.fillStyle = "white";
-    ctx.font = "30px Sans Serif";
-    var string = "GAME OVER";
-    ctx.fillText(string, (gridCanvas.width / 2) - (string.length * 10), gridCanvas.height / 2);
+    this.drawText("GAME OVER");
 }
