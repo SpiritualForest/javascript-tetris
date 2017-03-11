@@ -14,12 +14,11 @@ var K_QUIT = 81;
 var K_RESTART = 13;
 var K_LEVELUP = 76;
 
-/* TODO: Improve graphics. Make completed lines flash once or twice before deleting them and redrawing the grid. */
-
-/* TODO: Implement a ghost piece feature. */
+/* TODO: Implement a ghost piece feature.
+ * TODO: Line clearing animation. */
 
 function handleInput(ev) {
-    /* Handles keyboard input */
+    /* Handles input from keyboard and mouse */
     ev = ev || window.event;
     var go = handleInput.gameObject;
     if ((ev.type === "click") && (typeof go === "undefined")) {
@@ -222,7 +221,7 @@ function dropBlock() {
                  * Increase line count by one.
                  * Decrease the timeout for automove by 8 milliseconds */
                 delete this.grid.positions[y];
-                maxy = parseInt(y); // Required for clearing the grid
+                maxy = y; // Required for clearing the grid
                 linecount++; // Only required for calculating the score multipliction
                 this.lines++;
                 this.autoMoveMilliseconds -= 8;
@@ -239,7 +238,7 @@ function dropBlock() {
         this.score += scoreMultiplication[linecount-1] * (this.level + 1) * this.previousLineCount;
         this.previousLineCount = linecount;
         /* Rearrange the grid after the completed lines have been removed */
-        this.pushLines(maxy);
+        this.pushLines(parseInt(maxy));
     }
     /* Scoring based on grid cells soft dropped */
     this.score += (y + squareSize) / squareSize;

@@ -110,16 +110,11 @@ function drawStats() {
     yposition = statsCanvas.height / 3;
     ctx.font = fontSize + "px Sans Serif";
     /* fillText draws from the bottom upwards, rather than from the top downwards */
-    var centerx = (statsCanvas.width / 2) - 12;
-    /* First of all, we draw the stats names */
-    ctx.fillStyle = "darkblue";
-    ctx.fillText("Lines: ", centerx, fontSize + 2);
-    ctx.fillText("Score: ", centerx, yposition + fontSize + 2);
-    ctx.fillText("Level: ", centerx, (yposition * 2) + (fontSize + 2));
-    /* Now let's draw the actual stats */
-    ctx.fillText(this.lines, centerx, (fontSize * 2) + (fontSize / 2));
-    ctx.fillText(this.score, centerx, yposition + (fontSize * 2) + (fontSize / 2));
-    ctx.fillText(this.level, centerx, (yposition * 2) + (fontSize * 2) + (fontSize / 2));
+    /* Draw the stats */
+    ctx.fillStyle = "white";
+    ctx.fillText("Lines: " + this.lines, 1, fontSize + 2);
+    ctx.fillText("Score: " + this.score, 1, yposition + fontSize + 2);
+    ctx.fillText("Level: " + this.level, 1, (yposition * 2) + (fontSize + 2));
 }
 
 function drawSquare(x, y, size, color) {
