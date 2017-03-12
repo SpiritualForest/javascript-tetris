@@ -43,9 +43,20 @@ function handleInput(ev) {
         }
         /* These ones can only work if the game is in progress */
         if ((keyCode === D_LEFT) || (keyCode === D_RIGHT) || (keyCode === D_DOWN)) {
-            /* Movement keys.
-            * FIXME: Allow soft drop */
+            /* Movement keys. */
             drop = go.moveBlock(keyCode);
+            if (drop) {
+                /* If the user pressed the down key twice in a row and there was a collision, we drop the block */
+                go.softdrop++;
+                if (go.softdrop === 2) {
+                    /* Drop the block, clear the automatic movement timer, and then restart it.
+                     * If we don't clear it first, there will be two active timers. */
+                    go.dropBlock();
+                    clearTimeout(go.autoMoveTimer);
+                    go.restartAutoMove(true);
+                    go.softdrop = 0;
+                }
+            }
         }
         else if (keyCode === D_ROTATE) {
             /* Rotate the block */
@@ -111,9 +122,7 @@ function moveBlock(direction) {
             /* Downwards collision means that the block possibly needs to be added into the grid.
              * Since this function can also be called by the automove() function,
              * we return true here to indicate that a collision occured.
-             * The user input handling function will ignore this, 
-             * but automove() will call dropBlock(), which adds the coordinates to the grid.
-             * This means that the player cannot manually cause dropBlock() to be called. */
+             * It means that dropBlock() needs to be called. */
             return true;
         }
         // Since there was a collision, we do not proceed.
@@ -192,11 +201,41 @@ function pushLines(max) {
             delete this.grid.positions[i];
         }
     }
-    /* redrawGrid() is defined in graphics.js */
-    this.redrawGrid();
 }
 
 /* TODO: Line clearing animation!!! */
+
+function clearxPositions(xarray, y) {
+    /* xarray is an array of two x positions */
+    console.log(xarray); 
+    for(let x of xarray) {
+        this.drawSquare(x, y, squareSize, bgColor);
+    }
+}
+
+function clearLine(y) {
+    /* Line clearing animation function. */
+    var timeoutMs = 0; // timeout delay for setTimeout(), in milliseconds
+    /* Get the center x position on the grid */
+    var decreasingCenterx = this.grid.width / 2 - 1;
+    var increasingCenterx = decreasingCenterx + 1;
+    /* Now we loop until both x variables have reached the limits (0 and 9; the grid width is 10) */
+    var gameObject = this;
+    while((decreasingCenterx >= 0) && (increasingCenterx <= this.grid.width - 1)) {
+        /* Set the x array and call clearxPositions with a timeout.
+         * The center x positions are multiplied by squareSize
+         * because they need to be treated as pixels, not as single concrete squares. */
+        var xarray = [decreasingCenterx * squareSize, increasingCenterx * squareSize];
+        setTimeout(gameObject.clearxPositions.bind(this, xarray, y), timeoutMs);
+        /* Adjust the values */
+        decreasingCenterx--;
+        increasingCenterx++;
+        timeoutMs += 50;
+    }
+    /* Redraw the entire grid.
+     * redrawGrid() is defined in graphics.js */
+    setTimeout(gameObject.redrawGrid.bind(this), timeoutMs + 20);
+}
 
 function dropBlock() {
     /* This function adds the block's coordinates to the grid. */
@@ -217,9 +256,11 @@ function dropBlock() {
             grid.positions[y].push([x, block.color]);
             if (this.isLineCompleted(y)) {
                 /* Line completed.
-                 * Remove it from the grid.
+                 * Call the line clearing animation function.
+                 * Remove the line from the grid.
                  * Increase line count by one.
                  * Decrease the timeout for automove by 8 milliseconds */
+                this.clearLine(y);
                 delete this.grid.positions[y];
                 maxy = y; // Required for clearing the grid
                 linecount++; // Only required for calculating the score multipliction

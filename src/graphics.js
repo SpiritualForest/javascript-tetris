@@ -154,6 +154,8 @@ function redrawGrid() {
             drawSquare(x, y, squareSize, color);
         }
     }
+    /* Also redraw the current block */
+    this.drawBlock();
 }
 
 function clearGrid() {

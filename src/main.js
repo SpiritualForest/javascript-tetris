@@ -14,6 +14,8 @@ function startGame(inputFunction) {
         isCollision: isCollision,
         isLineCompleted: isLineCompleted,
         pushLines: pushLines,
+        clearLine: clearLine,
+        clearxPositions: clearxPositions,
         endGame: endGame,
         /* Methods from blocks.js */
         shiftCoordinates: shiftCoordinates,
@@ -46,7 +48,8 @@ function startGame(inputFunction) {
         score: 0, // How many points
         level: 0, // Which level (drop speed)
         autoMoveMilliseconds: 1000, // automove delay for setTimeout()
-        previousLineCount: 1,
+        previousLineCount: 1, // For calculating the score when lines are completed
+        softdrop: 0, // For allowing the user to soft drop
         /* Canvas contexts. We don't actively need all of them yet */
         gridCtx: gridCanvas.getContext("2d"),
         statsCtx: statsCanvas.getContext("2d"),
