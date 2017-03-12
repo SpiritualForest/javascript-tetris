@@ -10,12 +10,11 @@ var D_RIGHT = 39;
 var D_DOWN = 40;
 /* Other input constants */
 var K_PAUSE = 80;
-var K_QUIT = 81;
+var K_QUIT = 27;
 var K_RESTART = 13;
 var K_LEVELUP = 76;
 
-/* TODO: Implement a ghost piece feature.
- * TODO: Line clearing animation. */
+/* TODO: Implement a ghost piece feature. */
 
 function handleInput(ev) {
     /* Handles input from keyboard and mouse */
@@ -37,7 +36,7 @@ function handleInput(ev) {
         return;
     }
     if ((typeof go !== "undefined") && (go.gameStarted)) {
-        if ((keyCode !== K_PAUSE) && (keyCode !== K_QUIT) && (keyCode !== K_RESTART) && (go.paused)) {
+        if ((go.paused) && (keyCode !== K_PAUSE) && (keyCode !== K_QUIT) && (keyCode !== K_RESTART)) {
             /* Only pause, quit, and restart keys can work while the game is paused. */
             return;
         }
@@ -203,13 +202,10 @@ function pushLines(max) {
     }
 }
 
-/* TODO: Line clearing animation!!! */
-
 function clearxPositions(xarray, y) {
     /* xarray is an array of two x positions */
-    console.log(xarray); 
     for(let x of xarray) {
-        this.drawSquare(x, y, squareSize, bgColor);
+        this.gridCtx.clearRect(x, y, squareSize, squareSize);
     }
 }
 
@@ -262,7 +258,7 @@ function dropBlock() {
                  * Decrease the timeout for automove by 8 milliseconds */
                 this.clearLine(y);
                 delete this.grid.positions[y];
-                maxy = y; // Required for clearing the grid
+                maxy = y; // Required for pushLines()
                 linecount++; // Only required for calculating the score multipliction
                 this.lines++;
                 this.autoMoveMilliseconds -= 8;

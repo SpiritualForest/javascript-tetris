@@ -160,6 +160,5 @@ function redrawGrid() {
 
 function clearGrid() {
     /* All this does is call clearRect() on the grid canvas */
-    var ctx = gridCanvas.getContext("2d");
-    ctx.clearRect(0, 0, this.grid.width * squareSize, this.grid.height);
+    this.gridCtx.clearRect(0, 0, this.grid.width * squareSize, this.grid.height);
 }
