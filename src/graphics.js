@@ -59,9 +59,8 @@ function positionCanvases() {
 }
 
 function drawNextBlock() {
-    /* Get the center x position on the next block canvas */
+    /* Draws the next block on the next block canvas */
     var blockObject = this.nextblock;
-    /* Make a copy of the upcoming block's coordinates */
     var coordinates = this.convertCoordinatesMap(blockObject.coordinatesMap, nextBlockCanvas.width / squareSize, blockObject.width);
     var ctx = nextBlockCanvas.getContext("2d");
     ctx.clearRect(0, 0, nextBlockCanvas.width, nextBlockCanvas.height);
@@ -154,11 +153,19 @@ function redrawGrid() {
             drawSquare(x, y, squareSize, color);
         }
     }
-    /* Also redraw the current block */
+    /* Also redraw the current block and allow movement again */
     this.drawBlock();
+    this.allowMovement = true;
 }
 
 function clearGrid() {
     /* All this does is call clearRect() on the grid canvas */
     this.gridCtx.clearRect(0, 0, this.grid.width * squareSize, this.grid.height);
+}
+
+function clearxPositions(xarray, y) {
+    /* Calls clearRect() on the positions from xarray and y */
+    for(let x of xarray) {
+        this.gridCtx.clearRect(x, y, squareSize, squareSize);
+    }
 }

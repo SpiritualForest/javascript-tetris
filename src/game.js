@@ -8,15 +8,23 @@ var D_LEFT = 37;
 var D_ROTATE = 38;
 var D_RIGHT = 39;
 var D_DOWN = 40;
+var D_LIST = [D_LEFT, D_RIGHT, D_DOWN];
 /* Other input constants */
 var K_PAUSE = 80;
 var K_QUIT = 27;
+var K_QUIT2 = 81;
 var K_RESTART = 13;
+var FK_LIST = [K_PAUSE, K_QUIT, K_QUIT2, K_RESTART]; // Function-keys list.
 var K_LEVELUP = 76;
 
 /* TODO: Implement a ghost piece feature. */
 
+/* FIXME: Allowing soft drop potentially causes problems
+ * because the next block is already movable before the previous lines have been cleared. */
+
 function handleInput(ev) {
+    /* FIXME: REFACTOR THIS FUNCTION TO REDUCE REDUNDANCY AND IMPROVE PERFORMANCE!!! */
+
     /* Handles input from keyboard and mouse */
     ev = ev || window.event;
     var go = handleInput.gameObject;
@@ -36,12 +44,13 @@ function handleInput(ev) {
         return;
     }
     if ((typeof go !== "undefined") && (go.gameStarted)) {
-        if ((go.paused) && (keyCode !== K_PAUSE) && (keyCode !== K_QUIT) && (keyCode !== K_RESTART)) {
-            /* Only pause, quit, and restart keys can work while the game is paused. */
+        if ((go.paused) && (FK_LIST.indexOf(keyCode) === -1)) {
+            /* The pressed key was not found in the function keys list, and the game is paused.
+             * Only the function keys can work when the game is paused. */
             return;
         }
         /* These ones can only work if the game is in progress */
-        if ((keyCode === D_LEFT) || (keyCode === D_RIGHT) || (keyCode === D_DOWN)) {
+        if ((D_LIST.indexOf(keyCode) !== -1) && (go.allowMovement)) {
             /* Movement keys. */
             drop = go.moveBlock(keyCode);
             if (drop) {
@@ -57,7 +66,7 @@ function handleInput(ev) {
                 }
             }
         }
-        else if (keyCode === D_ROTATE) {
+        else if ((keyCode === D_ROTATE) && (go.allowMovement)) {
             /* Rotate the block */
             go.rotateBlock();
         }
@@ -78,7 +87,7 @@ function handleInput(ev) {
                 go.restartAutoMove();
             }
         }
-        else if (keyCode === K_QUIT) {
+        else if ((keyCode === K_QUIT) || (keyCode === K_QUIT2)) {
             /* Quit the game */
             go.endGame();
         }
@@ -202,13 +211,6 @@ function pushLines(max) {
     }
 }
 
-function clearxPositions(xarray, y) {
-    /* xarray is an array of two x positions */
-    for(let x of xarray) {
-        this.gridCtx.clearRect(x, y, squareSize, squareSize);
-    }
-}
-
 function clearLine(y) {
     /* Line clearing animation function. */
     var timeoutMs = 0; // timeout delay for setTimeout(), in milliseconds
@@ -274,8 +276,10 @@ function dropBlock() {
         var scoreMultiplication = [40, 100, 300, 1200];
         this.score += scoreMultiplication[linecount-1] * (this.level + 1) * this.previousLineCount;
         this.previousLineCount = linecount;
-        /* Rearrange the grid after the completed lines have been removed */
+        /* Rearrange the grid after the completed lines have been removed.
+         * Prohibit movement and rotation until all the lines have been cleared. */
         this.pushLines(parseInt(maxy));
+        this.allowMovement = false;
     }
     /* Scoring based on grid cells soft dropped */
     this.score += (y + squareSize) / squareSize;

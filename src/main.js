@@ -15,7 +15,6 @@ function startGame(inputFunction) {
         isLineCompleted: isLineCompleted,
         pushLines: pushLines,
         clearLine: clearLine,
-        clearxPositions: clearxPositions,
         endGame: endGame,
         /* Methods from blocks.js */
         shiftCoordinates: shiftCoordinates,
@@ -32,6 +31,7 @@ function startGame(inputFunction) {
         drawStats: drawStats,
         drawTextOnGrid: drawTextOnGrid,
         clearGrid: clearGrid,
+        clearxPositions: clearxPositions,
         /* Methods from main.js (this file) */
         autoMove: autoMove,
         restartAutoMove: restartAutoMove,
@@ -41,15 +41,17 @@ function startGame(inputFunction) {
             width: gridWidth,
             positions: {},
         },
-        /* Stats attributes */
+        /* Game procession attriutes */
         gameStarted: true, // Is the game on?
-        paused: false,
+        paused: false, // Is the game paused?
+        /* Stats attributes */
         lines: 0, // How many lines completed
         score: 0, // How many points
         level: 0, // Which level (drop speed)
         autoMoveMilliseconds: 1000, // automove delay for setTimeout()
         previousLineCount: 1, // For calculating the score when lines are completed
-        softdrop: 0, // For allowing the user to soft drop
+        softdrop: 0, // For allowing the user to soft drop. Needs to press down-key twice.
+        allowMovement: true, // Can the movement and rotation keys be used? This is only to avoid problems when redrawing the grid.
         /* Canvas contexts. We don't actively need all of them yet */
         gridCtx: gridCanvas.getContext("2d"),
         statsCtx: statsCanvas.getContext("2d"),

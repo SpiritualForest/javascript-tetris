@@ -7,5 +7,5 @@
 #### Up arrow key rotates the block.
 #### Pressing "L" increases the level (drop speed).
 #### Pressing "P" pauses and unpauses the game.
-#### Pressing the escape key stops the game.
+#### Pressing "Q" or Esc stops the game.
 #### Pressing ENTER will restart the game.
