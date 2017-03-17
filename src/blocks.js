@@ -96,7 +96,8 @@ function I() {
                 [1, 1, 1, 1]
             ]
         ],
-        color: "cyan",
+        color: "cyan", // Block color
+        ghostColor: "#A9F5F2", // For the ghost piece
         width: 4,// Needed for positioning
         type: "I",
     };
@@ -116,6 +117,7 @@ function O() {
             ]
         ],
         color: "yellow",
+        ghostColor: "#F2F5A9",
         width: 2,
         type: "O",
     };
@@ -154,6 +156,7 @@ function T(){
             ]
         ],
         color: "purple",
+        ghostColor: "#D0A9F5",
         width: 3,
         type: "T",
     };
@@ -192,6 +195,7 @@ function J() {
             ]
         ],
         color: "blue",
+        ghostColor: "#CECEF6",
         width: 3,
         type: "J",
     };
@@ -230,6 +234,7 @@ function L() {
             ]
         ],
         color: "orange",
+        ghostColor: "#F6E3CE",
         width: 3,
         type: "L",
     };
@@ -256,6 +261,7 @@ function S() {
             ]
         ],
         color: "lime",
+        ghostColor: "#CEF6CE",
         width: 3,
         type: "S",
     };
@@ -282,6 +288,7 @@ function Z() {
             ]
         ],
         color: "red",
+        ghostColor: "#F6CECE",
         width: 3,
         type: "Z",
     };

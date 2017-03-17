@@ -134,16 +134,17 @@ function drawCoordinates(coordinates, color) {
 
 function drawBlock() {
     /* Draws a block on the grid */
-    drawCoordinates(this.block.coordinates, this.block.color);
+    this.drawCoordinates(this.block.coordinates, this.block.color);
 }
 
 function deleteBlock() {
     /* Overwrites the squares specified by the block's coordinates with the canvas' background colour */
-    drawCoordinates(this.block.coordinates, bgColor);
+    this.drawCoordinates(this.block.coordinates, bgColor);
 }
 
 function redrawGrid() {
     /* Clears the grid and redraws all the squares */
+    console.log("redrawGrid() called");
     this.clearGrid();
     var grid = this.grid;
     /* Now loop on the grid's positions and redraw them one by one */
@@ -164,7 +165,9 @@ function clearGrid() {
 }
 
 function clearxPositions(xarray, y) {
-    /* Calls clearRect() on the positions from xarray and y */
+    /* Calls clearRect() on the positions from xarray and y.
+     * Note that xarray MUST be an array:
+     * this.clearxPositions([0, 1], 0); */
     for(let x of xarray) {
         this.gridCtx.clearRect(x, y, squareSize, squareSize);
     }
@@ -172,9 +175,11 @@ function clearxPositions(xarray, y) {
 
 function drawGhost() {
     /* Draw the ghost piece */
-    for (let xy of this.block.ghost) {
-        // Draw full squares for now, until we can draw only skeletons
-        var x = xy[0], y = xy[1];
-        this.drawSquare(x, y, squareSize, this.block.color);
-    }
+    this.drawCoordinates(this.block.ghost, this.block.ghostColor);
 }
+
+function deleteGhost() {
+    /* Overwrites the ghost's squares with the grid's background colour */
+    this.drawCoordinates(this.block.ghost, bgColor);
+}
+

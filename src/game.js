@@ -10,15 +10,15 @@ var D_RIGHT = 39;
 var D_DOWN = 40;
 var D_LIST = [D_LEFT, D_RIGHT, D_DOWN];
 /* Other input constants */
-var K_PAUSE = 80;
-var K_QUIT = 27;
-var K_QUIT2 = 81;
-var K_RESTART = 13;
+var K_PAUSE = 80;   // P
+var K_QUIT = 27;    // Esc
+var K_QUIT2 = 81;   // Q
+var K_RESTART = 13; // Enter
 var FK_LIST = [K_PAUSE, K_QUIT, K_QUIT2, K_RESTART]; // Function-keys list.
-var K_LEVELUP = 76;
-var K_HARDDROP = 32;
+var K_LEVELUP = 76; // L
+var K_HARDDROP = 32; // Spacebar
 
-/* TODO: Implement a ghost piece feature. */
+/* TODO: The ghost piece feels unnatural at times. Make its existence configurable, rather than mandatory. */
 
 function handleInput(ev) {
     /* FIXME: REFACTOR THIS FUNCTION TO REDUCE REDUNDANCY AND IMPROVE PERFORMANCE!!! */
@@ -116,6 +116,7 @@ function rotateBlock() {
         /* Cannot perform the rotation due to a collision or out-of-bounds squares. */
         return;
     }
+    /* The rotation is possible. There was no collision. */
     this.deleteBlock(); // Clear the block's old squares from the screen
     block.coordinates = rotationCoordinates;
     block.currentRotation += 1;
@@ -124,6 +125,8 @@ function rotateBlock() {
         block.currentRotation = 0;
     }
     this.drawBlock(); // Draw the block's new squares
+    /* Now we rotate the ghost as well */
+    this.moveGhost();
 }
 
 function moveBlock(direction) {
@@ -147,6 +150,7 @@ function moveBlock(direction) {
      * Then we update the block's coordinates and draw it at the next position. */
     this.deleteBlock();
     block.coordinates = newCoordinates;
+    this.moveGhost(direction);
     this.drawBlock();
     /* Update all the block's rotation coordinates as well */
     var len = block.rotations.length;
@@ -175,26 +179,14 @@ function hardDropGhost() {
 }
 
 function moveGhost(direction) {
-    /* Moves the ghost piece around. */
-    if (direction === D_DOWN) {
-        /* The ghost is always hard-dropped rather than moved downwards square by square */
-        return;
-    }
-    /* Clear the ghost's old coordinates.
-     * For the experimental phase we'll use the drawCoordinates() function to achieve that. */
-    this.drawCoordinates(this.block.ghost, bgColor);
-    var coordinates = this.shiftCoordinates(this.block.ghost, direction);
-    if (this.isCollision(coordinates)) {
-        /* The ghost collided. Reset it and then hard-drop it */
-        this.resetGhost();
-        this.hardDropGhost();
-    }
-    else {
-        /* No collision. Set the new coordinates */
-        this.block.ghost = coordinates;
-    }
-    /* Draw the ghost */
+    /* Moves the ghost piece around.
+     * FIXME: this function is extremely inefficient.
+     * FIXME: refactor it when possible. */
+    this.deleteGhost();
+    this.resetGhost();
+    this.hardDropGhost();
     this.drawGhost();
+    return;
 }
 
 function isCollision(coordinates) {

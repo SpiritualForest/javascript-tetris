@@ -24,6 +24,7 @@ function startGame(inputFunction) {
         getBlock: getBlock,
         convertCoordinatesMap: convertCoordinatesMap,
         getCenter: getCenter,
+        resetGhost: resetGhost,
         /* Methods from graphics.js */
         drawSquare: drawSquare,
         drawCoordinates: drawCoordinates,
@@ -36,6 +37,7 @@ function startGame(inputFunction) {
         clearGrid: clearGrid,
         clearxPositions: clearxPositions,
         drawGhost: drawGhost,
+        deleteGhost: deleteGhost,
         /* Methods from main.js (this file) */
         autoMove: autoMove,
         restartAutoMove: restartAutoMove,
@@ -68,9 +70,10 @@ function startGame(inputFunction) {
     gameObject.nextblock = gameObject.getBlock();
     /* Clear the grid */
     gameObject.redrawGrid();
-    /* Draw the current and next blocks */
+    /* Draw the current, next, and ghost blocks */
     gameObject.drawBlock();
     gameObject.drawNextBlock();
+    gameObject.moveGhost();
     /* Draw the stats */
     gameObject.drawStats();
     /* Initiate the automatic movement timer */
@@ -94,6 +97,8 @@ function restartAutoMove(spawnNew) {
         this.drawBlock();
         this.nextblock = this.getBlock();
         this.drawNextBlock();
+        /* Draw the ghost */
+        this.moveGhost();
     }
     var gameObject = this;
     this.autoMoveTimer = setTimeout(function() { gameObject.autoMove() }, this.autoMoveMilliseconds);
