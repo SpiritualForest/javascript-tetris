@@ -16,11 +16,9 @@ var K_QUIT2 = 81;
 var K_RESTART = 13;
 var FK_LIST = [K_PAUSE, K_QUIT, K_QUIT2, K_RESTART]; // Function-keys list.
 var K_LEVELUP = 76;
+var K_HARDDROP = 32;
 
 /* TODO: Implement a ghost piece feature. */
-
-/* FIXME: Allowing soft drop potentially causes problems
- * because the next block is already movable before the previous lines have been cleared. */
 
 function handleInput(ev) {
     /* FIXME: REFACTOR THIS FUNCTION TO REDUCE REDUNDANCY AND IMPROVE PERFORMANCE!!! */
@@ -65,6 +63,15 @@ function handleInput(ev) {
                     go.softdrop = 0;
                 }
             }
+        }
+        else if (keyCode === K_HARDDROP) {
+            /* Hard drop the block */
+            go.block.coordinates = go.hardDrop(go.block.coordinates.slice());
+            go.redrawGrid();
+            go.dropBlock();
+            console.log(go.grid);
+            clearTimeout(go.autoMoveTimer);
+            go.restartAutoMove(true);
         }
         else if ((keyCode === D_ROTATE) && (go.allowMovement)) {
             /* Rotate the block */
@@ -148,6 +155,48 @@ function moveBlock(direction) {
     }
 }
 
+function hardDrop(coordinates) {
+    /* Shifts the coordinates downwards repeatedly until a collision occurs,
+     * and then returns the coordinates */
+    var newCoordinates = [];
+    //coordinates = this.shiftCoordinates(coordinates, D_DOWN);
+    while (!this.isCollision(coordinates)) {
+        /* If there's no collision, we copy the uncollided coordinates into newCoordinates.
+         * Then we shift the uncollided coordinates downwards again. */
+        newCoordinates = coordinates.slice();
+        coordinates = this.shiftCoordinates(coordinates, D_DOWN);
+    }
+    return newCoordinates;
+}
+
+function hardDropGhost() {
+    /* Hard-drops the ghost piece */
+    this.block.ghost = this.hardDrop(this.block.ghost);
+}
+
+function moveGhost(direction) {
+    /* Moves the ghost piece around. */
+    if (direction === D_DOWN) {
+        /* The ghost is always hard-dropped rather than moved downwards square by square */
+        return;
+    }
+    /* Clear the ghost's old coordinates.
+     * For the experimental phase we'll use the drawCoordinates() function to achieve that. */
+    this.drawCoordinates(this.block.ghost, bgColor);
+    var coordinates = this.shiftCoordinates(this.block.ghost, direction);
+    if (this.isCollision(coordinates)) {
+        /* The ghost collided. Reset it and then hard-drop it */
+        this.resetGhost();
+        this.hardDropGhost();
+    }
+    else {
+        /* No collision. Set the new coordinates */
+        this.block.ghost = coordinates;
+    }
+    /* Draw the ghost */
+    this.drawGhost();
+}
+
 function isCollision(coordinates) {
     /* Checks whether the given coordinates collide with any other coordinates
      * that already exist in the grid, or whether they go off the grid altogether. */
@@ -190,7 +239,7 @@ function isLineCompleted(y) {
 }
 
 function pushLines(max) {
-    /* Push all lines downwards */
+    /* Push all lines downwards after completing lines. */
     var min = Math.min(parseInt(Object.keys(this.grid.positions))); // top most line on the grid
     /* We have to loop backwards from max towards min.
      * If we encounter a key whose value is undefined,
@@ -205,6 +254,8 @@ function pushLines(max) {
             step += squareSize;
         }
         else {
+            /* This line is not empty. Push its values downwards by <step>
+             * and then delete it from the grid. */
             this.grid.positions[i+step] = values;
             delete this.grid.positions[i];
         }
@@ -219,7 +270,8 @@ function clearLine(y) {
     var increasingCenterx = decreasingCenterx + 1;
     /* Now we loop until both x variables have reached the limits (0 and 9; the grid width is 10) */
     var gameObject = this;
-    while((decreasingCenterx >= 0) && (increasingCenterx <= this.grid.width - 1)) {
+    var width = this.grid.width - 1;
+    while((decreasingCenterx >= 0) && (increasingCenterx <= width)) {
         /* Set the x array and call clearxPositions with a timeout.
          * The center x positions are multiplied by squareSize
          * because they need to be treated as pixels, not as single concrete squares. */
@@ -230,9 +282,9 @@ function clearLine(y) {
         increasingCenterx++;
         timeoutMs += 50;
     }
-    /* Redraw the entire grid.
+    /* Redraw the entire grid 5 milliseconds after clearing the final line.
      * redrawGrid() is defined in graphics.js */
-    setTimeout(gameObject.redrawGrid.bind(this), timeoutMs + 20);
+    setTimeout(gameObject.redrawGrid.bind(this), timeoutMs + 5);
 }
 
 function dropBlock() {

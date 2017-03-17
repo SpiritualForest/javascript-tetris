@@ -72,6 +72,11 @@ function shiftCoordinates(coordinates, direction) {
     return newCoordinates;
 }
 
+function resetGhost() {
+    /* Resets the ghost piece's coordinates to that of the block's current coordinates */
+    this.block.ghost = this.block.coordinates.slice();
+}
+
 function I() {
     var block = {
         /* Coordinates is a list of arrays */
@@ -289,6 +294,8 @@ function getBlock() {
     var block = blockType();
     /* Convert the block's coordinates map into actual [x,y] positions. */
     block.coordinates = this.convertCoordinatesMap(block.coordinatesMap, this.grid.width, block.width);
+    /* Initialize the ghost piece's coordinates to the block's initial coordinates. */
+    block.ghost = block.coordinates.slice();
     /* Now convert the block's rotations map into actual [x,y] positions,
      * and push them into a rotations list-of-lists. */
     block.rotations = [];

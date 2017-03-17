@@ -169,3 +169,12 @@ function clearxPositions(xarray, y) {
         this.gridCtx.clearRect(x, y, squareSize, squareSize);
     }
 }
+
+function drawGhost() {
+    /* Draw the ghost piece */
+    for (let xy of this.block.ghost) {
+        // Draw full squares for now, until we can draw only skeletons
+        var x = xy[0], y = xy[1];
+        this.drawSquare(x, y, squareSize, this.block.color);
+    }
+}

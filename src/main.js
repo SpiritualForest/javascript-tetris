@@ -15,6 +15,9 @@ function startGame(inputFunction) {
         isLineCompleted: isLineCompleted,
         pushLines: pushLines,
         clearLine: clearLine,
+        moveGhost: moveGhost,
+        hardDrop: hardDrop,
+        hardDropGhost: hardDropGhost,
         endGame: endGame,
         /* Methods from blocks.js */
         shiftCoordinates: shiftCoordinates,
@@ -32,6 +35,7 @@ function startGame(inputFunction) {
         drawTextOnGrid: drawTextOnGrid,
         clearGrid: clearGrid,
         clearxPositions: clearxPositions,
+        drawGhost: drawGhost,
         /* Methods from main.js (this file) */
         autoMove: autoMove,
         restartAutoMove: restartAutoMove,
