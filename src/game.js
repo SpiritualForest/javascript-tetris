@@ -69,7 +69,6 @@ function handleInput(ev) {
             go.block.coordinates = go.hardDrop(go.block.coordinates.slice());
             go.redrawGrid();
             go.dropBlock();
-            console.log(go.grid);
             clearTimeout(go.autoMoveTimer);
             go.restartAutoMove(true);
         }

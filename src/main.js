@@ -71,9 +71,9 @@ function startGame(inputFunction) {
     /* Clear the grid */
     gameObject.redrawGrid();
     /* Draw the current, next, and ghost blocks */
-    gameObject.drawBlock();
     gameObject.drawNextBlock();
     gameObject.moveGhost();
+    gameObject.drawBlock();
     /* Draw the stats */
     gameObject.drawStats();
     /* Initiate the automatic movement timer */
@@ -94,11 +94,10 @@ function restartAutoMove(spawnNew) {
     /* if spawnNew is true, we spawn a new block */
     if (spawnNew) {
         this.block = Object.create(this.nextblock);
+        this.moveGhost(); // Draw the ghost piece
         this.drawBlock();
         this.nextblock = this.getBlock();
         this.drawNextBlock();
-        /* Draw the ghost */
-        this.moveGhost();
     }
     var gameObject = this;
     this.autoMoveTimer = setTimeout(function() { gameObject.autoMove() }, this.autoMoveMilliseconds);
