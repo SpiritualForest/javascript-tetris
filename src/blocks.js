@@ -72,11 +72,6 @@ function shiftCoordinates(coordinates, direction) {
     return newCoordinates;
 }
 
-function resetGhost() {
-    /* Resets the ghost piece's coordinates to that of the block's current coordinates */
-    this.block.ghost = this.block.coordinates.slice();
-}
-
 function I() {
     var block = {
         /* Coordinates is a list of arrays */
@@ -97,7 +92,6 @@ function I() {
             ]
         ],
         color: "cyan", // Block color
-        ghostColor: "#A9F5F2", // For the ghost piece
         width: 4,// Needed for positioning
         type: "I",
     };
@@ -117,7 +111,6 @@ function O() {
             ]
         ],
         color: "yellow",
-        ghostColor: "#F2F5A9",
         width: 2,
         type: "O",
     };
@@ -156,7 +149,6 @@ function T(){
             ]
         ],
         color: "purple",
-        ghostColor: "#D0A9F5",
         width: 3,
         type: "T",
     };
@@ -195,7 +187,6 @@ function J() {
             ]
         ],
         color: "blue",
-        ghostColor: "#CECEF6",
         width: 3,
         type: "J",
     };
@@ -234,7 +225,6 @@ function L() {
             ]
         ],
         color: "orange",
-        ghostColor: "#F6E3CE",
         width: 3,
         type: "L",
     };
@@ -261,7 +251,6 @@ function S() {
             ]
         ],
         color: "lime",
-        ghostColor: "#CEF6CE",
         width: 3,
         type: "S",
     };
@@ -288,7 +277,6 @@ function Z() {
             ]
         ],
         color: "red",
-        ghostColor: "#F6CECE",
         width: 3,
         type: "Z",
     };
@@ -301,8 +289,6 @@ function getBlock() {
     var block = blockType();
     /* Convert the block's coordinates map into actual [x,y] positions. */
     block.coordinates = this.convertCoordinatesMap(block.coordinatesMap, this.grid.width, block.width);
-    /* Initialize the ghost piece's coordinates to the block's initial coordinates. */
-    block.ghost = block.coordinates.slice();
     /* Now convert the block's rotations map into actual [x,y] positions,
      * and push them into a rotations list-of-lists. */
     block.rotations = [];

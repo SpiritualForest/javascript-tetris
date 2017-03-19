@@ -18,8 +18,6 @@ var FK_LIST = [K_PAUSE, K_QUIT, K_QUIT2, K_RESTART]; // Function-keys list.
 var K_LEVELUP = 76; // L
 var K_HARDDROP = 32; // Spacebar
 
-/* TODO: The ghost piece feels unnatural at times. Make its existence configurable, rather than mandatory. */
-
 function handleInput(ev) {
     /* FIXME: REFACTOR THIS FUNCTION TO REDUCE REDUNDANCY AND IMPROVE PERFORMANCE!!! */
 
@@ -124,8 +122,6 @@ function rotateBlock() {
         block.currentRotation = 0;
     }
     this.drawBlock(); // Draw the block's new squares
-    /* Now we rotate the ghost as well */
-    this.moveGhost();
 }
 
 function moveBlock(direction) {
@@ -149,7 +145,6 @@ function moveBlock(direction) {
      * Then we update the block's coordinates and draw it at the next position. */
     this.deleteBlock();
     block.coordinates = newCoordinates;
-    this.moveGhost(direction);
     this.drawBlock();
     /* Update all the block's rotation coordinates as well */
     var len = block.rotations.length;
@@ -170,22 +165,6 @@ function hardDrop(coordinates) {
         coordinates = this.shiftCoordinates(coordinates, D_DOWN);
     }
     return newCoordinates;
-}
-
-function hardDropGhost() {
-    /* Hard-drops the ghost piece */
-    this.block.ghost = this.hardDrop(this.block.ghost);
-}
-
-function moveGhost(direction) {
-    /* Moves the ghost piece around.
-     * FIXME: this function is extremely inefficient.
-     * FIXME: refactor it when possible. */
-    this.deleteGhost();
-    this.resetGhost();
-    this.hardDropGhost();
-    this.drawGhost();
-    return;
 }
 
 function isCollision(coordinates) {

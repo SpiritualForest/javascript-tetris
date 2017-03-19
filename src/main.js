@@ -15,16 +15,13 @@ function startGame(inputFunction) {
         isLineCompleted: isLineCompleted,
         pushLines: pushLines,
         clearLine: clearLine,
-        moveGhost: moveGhost,
         hardDrop: hardDrop,
-        hardDropGhost: hardDropGhost,
         endGame: endGame,
         /* Methods from blocks.js */
         shiftCoordinates: shiftCoordinates,
         getBlock: getBlock,
         convertCoordinatesMap: convertCoordinatesMap,
         getCenter: getCenter,
-        resetGhost: resetGhost,
         /* Methods from graphics.js */
         drawSquare: drawSquare,
         drawCoordinates: drawCoordinates,
@@ -36,8 +33,6 @@ function startGame(inputFunction) {
         drawTextOnGrid: drawTextOnGrid,
         clearGrid: clearGrid,
         clearxPositions: clearxPositions,
-        drawGhost: drawGhost,
-        deleteGhost: deleteGhost,
         /* Methods from main.js (this file) */
         autoMove: autoMove,
         restartAutoMove: restartAutoMove,
@@ -70,9 +65,8 @@ function startGame(inputFunction) {
     gameObject.nextblock = gameObject.getBlock();
     /* Clear the grid */
     gameObject.redrawGrid();
-    /* Draw the current, next, and ghost blocks */
+    /* Draw the current and blocks */
     gameObject.drawNextBlock();
-    gameObject.moveGhost();
     gameObject.drawBlock();
     /* Draw the stats */
     gameObject.drawStats();
@@ -94,7 +88,6 @@ function restartAutoMove(spawnNew) {
     /* if spawnNew is true, we spawn a new block */
     if (spawnNew) {
         this.block = Object.create(this.nextblock);
-        this.moveGhost(); // Draw the ghost piece
         this.drawBlock();
         this.nextblock = this.getBlock();
         this.drawNextBlock();

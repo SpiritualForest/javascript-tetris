@@ -144,7 +144,6 @@ function deleteBlock() {
 
 function redrawGrid() {
     /* Clears the grid and redraws all the squares */
-    console.log("redrawGrid() called");
     this.clearGrid();
     var grid = this.grid;
     /* Now loop on the grid's positions and redraw them one by one */
@@ -172,14 +171,3 @@ function clearxPositions(xarray, y) {
         this.gridCtx.clearRect(x, y, squareSize, squareSize);
     }
 }
-
-function drawGhost() {
-    /* Draw the ghost piece */
-    this.drawCoordinates(this.block.ghost, this.block.ghostColor);
-}
-
-function deleteGhost() {
-    /* Overwrites the ghost's squares with the grid's background colour */
-    this.drawCoordinates(this.block.ghost, bgColor);
-}
-
