@@ -155,9 +155,8 @@ function moveBlock(direction) {
 
 function hardDrop(coordinates) {
     /* Shifts the coordinates downwards repeatedly until a collision occurs,
-     * and then returns the coordinates */
+     * and then returns the down-most uncollided coordinates */
     var newCoordinates = [];
-    //coordinates = this.shiftCoordinates(coordinates, D_DOWN);
     while (!this.isCollision(coordinates)) {
         /* If there's no collision, we copy the uncollided coordinates into newCoordinates.
          * Then we shift the uncollided coordinates downwards again. */
@@ -304,11 +303,12 @@ function dropBlock() {
         this.allowMovement = false;
     }
     /* Scoring based on grid cells soft dropped */
-    this.score += (y + squareSize) / squareSize;
+    this.score += ((y + squareSize) / squareSize) * (this.randomizerHeight * 2) + 1;
     this.drawStats(); // Defined in graphics.js
     /* Check for game ending */
     if ("0" in grid.positions) {
-        /* top row reached. End the game */
+        /* top row reached. End the game.
+         * return true to indicate to autoMove() that the game should end. */
         this.endGame();
         return true;
     }
@@ -322,3 +322,43 @@ function endGame() {
      * drawText() is defined in graphics.js */
     this.drawTextOnGrid("GAME OVER", 20);
 }
+
+function getRandomNumber(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+}
+
+function randomizeGrid() {
+    /* Adds random coordinates to the grid based on gameObject.randomizerHeight.
+     * FIXME: the xlist should NOT be hard-coded. It only supports gridWidth 10 right now. */
+    var colors = ["lime", "red", "cyan", "yellow", "purple", "blue", "orange"]; // Block colours
+    var xlist = [0, 20, 40, 60, 80, 100, 120, 140, 160, 180]; // List of x positions
+    var splicedList = [];
+    /* Now loop <randomizerHeight> * 2 + 1 times */
+    var lowestPosition = this.grid.height - squareSize; // Lowest y position we can draw on, in pixels
+    var topPosition = lowestPosition - ((this.randomizerHeight * 2 * squareSize) + squareSize); // Highest y position we can draw on, in pixels
+    for(var y = lowestPosition; y > topPosition; y -= squareSize) {
+        /* Generate a random number between 3 and 9.
+         * This will determine how many x positions we'll draw on in this y position */
+        var iterations = getRandomNumber(3, 10);
+        this.grid.positions[y] = []; // Initialize the list-of-lists on this y position
+        for(var x = 0; x < iterations; x++) {
+            /* Fetch a random colour and a random x value */
+            var color = colors[getRandomNumber(0, colors.length)];
+            
+            /* We splice here to avoid the possibility of drawing duplicate values at random.
+             * We will readd the spliced values into the original xlist array after we're done with this loop.
+             * We must first get the x position as a single value, because array.splice() returns another array.
+             * So we call splice() only to remove the value from xlist, but discard the result of that operation. */
+            var xposIndex = getRandomNumber(0, xlist.length);
+            var xpos = xlist[xposIndex];
+            xlist.splice(xposIndex, 1);
+            splicedList.push(xpos);
+            this.grid.positions[y].push([xpos, color]);
+        }
+        /* Readd the spliced values back to our main xlist */
+        xlist = xlist.concat(splicedList);
+        /* Reset the spliced list */
+        splicedList = [];
+    }
+}
+

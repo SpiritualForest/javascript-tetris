@@ -63,7 +63,9 @@ function drawNextBlock() {
     var blockObject = this.nextblock;
     var coordinates = this.convertCoordinatesMap(blockObject.coordinatesMap, nextBlockCanvas.width / squareSize, blockObject.width);
     var ctx = nextBlockCanvas.getContext("2d");
+    /* Clear the canvas first */
     ctx.clearRect(0, 0, nextBlockCanvas.width, nextBlockCanvas.height);
+    /* Set the colour to the block's colour */
     ctx.fillStyle = blockObject.color;
     for(let xy of coordinates) {
         var x = xy[0], y = xy[1];
@@ -96,7 +98,7 @@ function drawStats() {
     /* First of all we clear the entire canvas */
     var ctx = statsCanvas.getContext("2d");
     ctx.clearRect(0, 0, statsCanvas.width, statsCanvas.height);
-    /* Now we draw borders on the canvas, because there are 3 types of stats */
+    /* Now we draw separator lines on the canvas, because there are 3 types of stats */
     var yposition = statsCanvas.height / 3;
     var fontSize = 12;
     ctx.strokeStyle = "black"; 

@@ -17,6 +17,7 @@ function startGame(inputFunction) {
         clearLine: clearLine,
         hardDrop: hardDrop,
         endGame: endGame,
+        randomizeGrid: randomizeGrid,
         /* Methods from blocks.js */
         shiftCoordinates: shiftCoordinates,
         getBlock: getBlock,
@@ -53,6 +54,7 @@ function startGame(inputFunction) {
         previousLineCount: 1, // For calculating the score when lines are completed
         softdrop: 0, // For allowing the user to soft drop. Needs to press down-key twice.
         allowMovement: true, // Can the movement and rotation keys be used? This is only to avoid problems when redrawing the grid.
+        randomizerHeight: document.getElementById("gridheight").value, // For the block randomizer function
         /* Canvas contexts. We don't actively need all of them yet */
         gridCtx: gridCanvas.getContext("2d"),
         statsCtx: statsCanvas.getContext("2d"),
@@ -63,6 +65,15 @@ function startGame(inputFunction) {
     /* We have to set the game blocks here, since "this" points to the window */
     gameObject.block = gameObject.getBlock();
     gameObject.nextblock = gameObject.getBlock();
+    /* If the randomizer height is more than 0, we call randomizeGrid() first */
+    if (gameObject.randomizerHeight > 0) {
+        if (gameObject.randomizerHeight > 8) {
+            /* The highest value can be 8. Otherwise it becomes impossible to actually play. */
+            gameObject.randomizerHeight = 8;
+            document.getElementById("gridheight").value = "8";
+        }
+        gameObject.randomizeGrid();
+    }
     /* Clear the grid */
     gameObject.redrawGrid();
     /* Draw the current and blocks */

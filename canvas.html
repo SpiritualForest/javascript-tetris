@@ -20,9 +20,15 @@
 }
 </style>
     <body style="background-color: #FAFAFA">
+        <!-- canvases -->
         <canvas id="grid" tabindex="1" height="440" width="200" style="background-color: #848484;"></canvas>
         <canvas id="stats" height="60" width="120" style="background-color: #848484;"></canvas>
         <canvas id="nextblock" height="40" width="100" style="background-color: #848484;"></canvas>
+        <!-- now the grid height form -->
+        <form>
+            Grid height:&nbsp;
+            <input type="text" name="gridheight" id="gridheight" value="0">
+        </form>
         <!-- Load the tetris scripts here -->
         <script src="src/blocks.js"></script>
         <script src="src/graphics.js"></script>
