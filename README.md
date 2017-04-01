@@ -10,3 +10,5 @@
 #### Pressing "P" pauses and unpauses the game.
 #### Pressing "Q" or Esc stops the game.
 #### Pressing ENTER will restart the game.
+
+#### It is now possible to specify the start level and height in the forms below the main grid canvas.

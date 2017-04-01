@@ -18,6 +18,9 @@
     position: absolute;
     border: 1px solid black;
 }
+#ghf {
+    position: absolute;
+}
 </style>
     <body style="background-color: #FAFAFA">
         <!-- canvases -->
@@ -25,9 +28,12 @@
         <canvas id="stats" height="60" width="120" style="background-color: #848484;"></canvas>
         <canvas id="nextblock" height="40" width="100" style="background-color: #848484;"></canvas>
         <!-- now the grid height form -->
-        <form>
-            Grid height:&nbsp;
-            <input type="text" name="gridheight" id="gridheight" value="0">
+        <form id="ghf">
+            <label for="gridheight">Start Height:</label>
+            <input type="text" name="gridheight" id="gridheight" value="0" style="width: 20px;">
+            <br><br>
+            <label for="startlevel">Start Level:&nbsp;&nbsp;</label>
+            <input type="text" name="startlevel" id="startlevel" value="0" style="width: 20px;">
         </form>
         <!-- Load the tetris scripts here -->
         <script src="src/blocks.js"></script>

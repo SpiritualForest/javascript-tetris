@@ -49,12 +49,12 @@ function startGame(inputFunction) {
         /* Stats attributes */
         lines: 0, // How many lines completed
         score: 0, // How many points
-        level: 0, // Which level (drop speed)
+        level: parseInt(document.getElementById("startlevel").value), // Which level (drop speed)
         autoMoveMilliseconds: 1000, // automove delay for setTimeout()
         previousLineCount: 1, // For calculating the score when lines are completed
         softdrop: 0, // For allowing the user to soft drop. Needs to press down-key twice.
         allowMovement: true, // Can the movement and rotation keys be used? This is only to avoid problems when redrawing the grid.
-        randomizerHeight: document.getElementById("gridheight").value, // For the block randomizer function
+        randomizerHeight: parseInt(document.getElementById("gridheight").value), // For the block randomizer function
         /* Canvas contexts. We don't actively need all of them yet */
         gridCtx: gridCanvas.getContext("2d"),
         statsCtx: statsCanvas.getContext("2d"),
@@ -74,6 +74,9 @@ function startGame(inputFunction) {
         }
         gameObject.randomizeGrid();
     }
+    /* Set the automove milliseconds according to the start level */
+    gameObject.autoMoveMilliseconds -= gameObject.level * 80;
+    console.log(gameObject.autoMoveMilliseconds);
     /* Clear the grid */
     gameObject.redrawGrid();
     /* Draw the current and blocks */

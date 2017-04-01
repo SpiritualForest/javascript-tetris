@@ -106,7 +106,6 @@ function handleInput(ev) {
 
 function rotateBlock() {
     /* Rotates the block */
-    // TODO: Need area based collision detection. Currently we only have grid based.
     var block = this.block;
     var rotationCoordinates = block.rotations[block.currentRotation].slice();
     if (this.isCollision(rotationCoordinates)) {
@@ -303,7 +302,7 @@ function dropBlock() {
         this.allowMovement = false;
     }
     /* Scoring based on grid cells soft dropped */
-    this.score += ((y + squareSize) / squareSize) * (this.randomizerHeight * 2) + 1;
+    this.score += ((y + squareSize) / squareSize) * ((this.randomizerHeight * 2) + 1);
     this.drawStats(); // Defined in graphics.js
     /* Check for game ending */
     if ("0" in grid.positions) {
@@ -361,4 +360,3 @@ function randomizeGrid() {
         splicedList = [];
     }
 }
-

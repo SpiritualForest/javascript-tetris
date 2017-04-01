@@ -16,6 +16,10 @@ function positionGridCanvas() {
     /* Positions the grid canvas */
     var y = (window.innerHeight / 2) - (gridHeight / 2);
     var x = (window.innerWidth / 2) - (gridCanvas.width + statsCanvas.width / 2) + statsCanvas.width + 6;
+    /* Since the grid height form should be placed directly under the canvas, we'll position it here too */
+    var form = document.getElementById("ghf");
+    form.style.top = y + 10 + gridHeight + "px";
+    form.style.left = x + "px";
     /* Add the styles */
     gridCanvas.style.top = y + "px";
     gridCanvas.style.left = x + "px";
