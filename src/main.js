@@ -76,7 +76,6 @@ function startGame(inputFunction) {
     }
     /* Set the automove milliseconds according to the start level */
     gameObject.autoMoveMilliseconds -= gameObject.level * 80;
-    console.log(gameObject.autoMoveMilliseconds);
     /* Clear the grid */
     gameObject.redrawGrid();
     /* Draw the current and blocks */
@@ -101,9 +100,13 @@ function autoMove() {
 function restartAutoMove(spawnNew) {
     /* if spawnNew is true, we spawn a new block */
     if (spawnNew) {
+        /* We "clone" the existing next block into this.block.
+         * Object.create() will create a new reference.
+         * Then we set this.nextblock to an entirely new block.
+         * Finally, we draw the new current block, and the new next block. */
         this.block = Object.create(this.nextblock);
-        this.drawBlock();
         this.nextblock = this.getBlock();
+        this.drawBlock();
         this.drawNextBlock();
     }
     var gameObject = this;

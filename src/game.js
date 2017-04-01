@@ -327,22 +327,27 @@ function getRandomNumber(min, max) {
 }
 
 function randomizeGrid() {
-    /* Adds random coordinates to the grid based on gameObject.randomizerHeight.
-     * FIXME: the xlist should NOT be hard-coded. It only supports gridWidth 10 right now. */
+    /* Adds random coordinates to the grid based on gameObject.randomizerHeight. */
     var colors = ["lime", "red", "cyan", "yellow", "purple", "blue", "orange"]; // Block colours
-    var xlist = [0, 20, 40, 60, 80, 100, 120, 140, 160, 180]; // List of x positions
+    var clen = colors.length; // For performance reasons.
+    /* Generate the xlist according to the grid width and square size */
+    var xlist = [];
+    for(var x = 0; x < this.grid.width; x++) {
+        /* Remember that the width is represented in whole squares, but the x positions we need to push should be in pixels. */
+        xlist.push(x * squareSize);
+    }
     var splicedList = [];
-    /* Now loop <randomizerHeight> * 2 + 1 times */
+    /* Now loop from lowestPosition until we reach topPosition. */
     var lowestPosition = this.grid.height - squareSize; // Lowest y position we can draw on, in pixels
     var topPosition = lowestPosition - ((this.randomizerHeight * 2 * squareSize) + squareSize); // Highest y position we can draw on, in pixels
     for(var y = lowestPosition; y > topPosition; y -= squareSize) {
-        /* Generate a random number between 3 and 9.
+        /* Generate a random number between 3 and the grid width - 1.
          * This will determine how many x positions we'll draw on in this y position */
-        var iterations = getRandomNumber(3, 10);
+        var iterations = getRandomNumber(3, this.grid.width);
         this.grid.positions[y] = []; // Initialize the list-of-lists on this y position
         for(var x = 0; x < iterations; x++) {
             /* Fetch a random colour and a random x value */
-            var color = colors[getRandomNumber(0, colors.length)];
+            var color = colors[getRandomNumber(0, clen)];
             
             /* We splice here to avoid the possibility of drawing duplicate values at random.
              * We will readd the spliced values into the original xlist array after we're done with this loop.
