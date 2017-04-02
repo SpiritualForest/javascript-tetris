@@ -341,9 +341,9 @@ function randomizeGrid() {
     var lowestPosition = this.grid.height - squareSize; // Lowest y position we can draw on, in pixels
     var topPosition = lowestPosition - ((this.randomizerHeight * 2 * squareSize) + squareSize); // Highest y position we can draw on, in pixels
     for(var y = lowestPosition; y > topPosition; y -= squareSize) {
-        /* Generate a random number between 3 and the grid width - 1.
+        /* Generate a random number between grid.width / 3 and grid.width.
          * This will determine how many x positions we'll draw on in this y position */
-        var iterations = getRandomNumber(3, this.grid.width);
+        var iterations = getRandomNumber(Math.floor(this.grid.width / 3), this.grid.width);
         this.grid.positions[y] = []; // Initialize the list-of-lists on this y position
         for(var x = 0; x < iterations; x++) {
             /* Fetch a random colour and a random x value */
