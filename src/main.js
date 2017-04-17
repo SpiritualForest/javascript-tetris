@@ -4,8 +4,12 @@
 /* TODO: Maybe a config file? Maybe attach this shit to an actual website */
 
 function startGame(inputFunction) {
-    /* Create a new grid object.
-     * gridHeight and gridWidth are defined in graphics.js */
+    /* Get the value for the starting height and drop speed forms.
+     * We do this because further down we'll check whether the returned values
+     * are of the NaN type, which we'd have to fix by resetting the values to 0. */
+    var randomizerHeight = parseInt(document.getElementById("gridheight").value);
+    var startlevel = parseInt(document.getElementById("startlevel").value);
+    /* Create a new game object */
     var gameObject = {
         /* Methods from game.js */
         moveBlock: moveBlock,
@@ -38,6 +42,8 @@ function startGame(inputFunction) {
         autoMove: autoMove,
         restartAutoMove: restartAutoMove,
         /* End of methods */
+        /* Create a new grid object.
+         * gridHeight and gridWidth are defined in graphics.js */
         grid: {
             height: gridHeight,
             width: gridWidth,
@@ -49,12 +55,12 @@ function startGame(inputFunction) {
         /* Stats attributes */
         lines: 0, // How many lines completed
         score: 0, // How many points
-        level: parseInt(document.getElementById("startlevel").value), // Which level (drop speed)
+        level: isNaN(startlevel) ? 0 : startlevel, // Which level (drop speed).
         autoMoveMilliseconds: 1000, // automove delay for setTimeout()
         previousLineCount: 1, // For calculating the score when lines are completed
         softdrop: 0, // For allowing the user to soft drop. Needs to press down-key twice.
         allowMovement: true, // Can the movement and rotation keys be used? This is only to avoid problems when redrawing the grid.
-        randomizerHeight: parseInt(document.getElementById("gridheight").value), // For the block randomizer function
+        randomizerHeight: isNaN(randomizerHeight) ? 0 : randomizerHeight, // For the block randomizer function
         /* Canvas contexts. We don't actively need all of them yet */
         gridCtx: gridCanvas.getContext("2d"),
         statsCtx: statsCanvas.getContext("2d"),
@@ -70,10 +76,12 @@ function startGame(inputFunction) {
         if (gameObject.randomizerHeight > 8) {
             /* The highest value can be 8. Otherwise it becomes impossible to actually play. */
             gameObject.randomizerHeight = 8;
-            document.getElementById("gridheight").value = "8";
         }
         gameObject.randomizeGrid();
     }
+    /* In case the user tried to be an idiot and enter non-number values on purpose, reset the form values */
+    document.getElementById("gridheight").value = gameObject.randomizerHeight;
+    document.getElementById("startlevel").value = gameObject.level;
     /* Set the automove milliseconds according to the start level */
     gameObject.autoMoveMilliseconds -= gameObject.level * 80;
     /* Clear the grid */

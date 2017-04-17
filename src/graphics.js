@@ -9,8 +9,8 @@ var statsCanvas = document.getElementById("stats");
 var nextBlockCanvas = document.getElementById("nextblock");
 var gridWidth = 10; // How many squares one row can contain
 var gridHeight = gridCanvas.height; // Only required for collision detection - this is pixels
-var squareSize = gridCanvas.width / gridWidth;
-var bgColor = gridCanvas.style.backgroundColor;
+var squareSize = gridCanvas.width / gridWidth; // The size of a square, in pixels.
+var bgColor = gridCanvas.style.backgroundColor; // The background colour of the grid canvas.
 
 function positionGridCanvas() {
     /* Positions the grid canvas */
