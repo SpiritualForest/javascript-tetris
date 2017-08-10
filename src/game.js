@@ -4,10 +4,10 @@
 
 /* Directional constants (arrow key codes for keydown event; D stands for direction).
  * The numbers are the ASCII values for the keys. */
-var D_LEFT = 37;
-var D_ROTATE = 38;
-var D_RIGHT = 39;
-var D_DOWN = 40;
+var D_LEFT = 37;   // Left arrow
+var D_ROTATE = 38; // Up arrow
+var D_RIGHT = 39;  // Right arrow
+var D_DOWN = 40;   // Down arrow
 var D_LIST = [D_LEFT, D_RIGHT, D_DOWN];
 /* Other input constants */
 var K_PAUSE = 80;   // P
@@ -276,17 +276,16 @@ function dropBlock() {
                 /* Line completed.
                  * Call the line clearing animation function.
                  * Remove the line from the grid.
-                 * Increase line count by one.
-                 * Decrease the timeout for automove by 8 milliseconds */
+                 * Increase line count by one. */
                 this.clearLine(y);
                 delete this.grid.positions[y];
                 maxy = y; // Required for pushLines()
                 linecount++; // Only required for calculating the score multipliction
                 this.lines++;
-                this.autoMoveMilliseconds -= 8;
                 if (this.lines % 10 === 0) {
-                    /* Increase the level after 10 lines */
+                    /* Increase the level after 10 lines and reduce the drop speed by 80 milliseconds. */
                     this.level++;
+                    this.autoMoveMilliseconds -= 80;
                 }
             }
         }

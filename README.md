@@ -1,4 +1,4 @@
-## The game is still in development.
+## The game is largely finished. Some code cleanup required, perhaps.
 ## To test it out, simply run the canvas.html file.
 
 ### Click on the canvas to start the game.
@@ -11,4 +11,4 @@
 #### Pressing "Q" or Esc stops the game.
 #### Pressing ENTER will restart the game.
 
-#### It is now possible to specify the start level and height in the forms below the main grid canvas.
+#### It is now possible to specify the start level and height in the text boxes below the main grid canvas.
