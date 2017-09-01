@@ -61,6 +61,7 @@ function startGame(inputFunction) {
         softdrop: 0, // For allowing the user to soft drop. Needs to press down-key twice.
         allowMovement: true, // Can the movement and rotation keys be used? This is only to avoid problems when redrawing the grid.
         randomizerHeight: isNaN(randomizerHeight) ? 0 : randomizerHeight, // For the block randomizer function
+        dropSpeedReduction: 65, // How many milliseconds to subtract from autoMoveMilliseconds when increasing a level
         /* Canvas contexts. We don't actively need all of them yet */
         gridCtx: gridCanvas.getContext("2d"),
         statsCtx: statsCanvas.getContext("2d"),
@@ -83,7 +84,7 @@ function startGame(inputFunction) {
     document.getElementById("gridheight").value = gameObject.randomizerHeight;
     document.getElementById("startlevel").value = gameObject.level;
     /* Set the automove milliseconds according to the start level */
-    gameObject.autoMoveMilliseconds -= gameObject.level * 80;
+    gameObject.autoMoveMilliseconds -= gameObject.level * gameObject.dropSpeedReduction;
     /* Clear the grid */
     gameObject.redrawGrid();
     /* Draw the current and blocks */
@@ -99,8 +100,7 @@ function autoMove() {
     var drop = this.moveBlock(D_DOWN);
     if (drop) {
         /* We encountered a collision. Drop the block. */
-        var gameOver = this.dropBlock();
-        if (gameOver) { return; }
+        this.dropBlock();
     }
     this.restartAutoMove(drop);
 }
@@ -113,6 +113,12 @@ function restartAutoMove(spawnNew) {
          * Then we set this.nextblock to an entirely new block.
          * Finally, we draw the new current block, and the new next block. */
         this.block = Object.create(this.nextblock);
+        if (this.isCollision(this.block.coordinates)) {
+            /* We can't draw the new block due to a collision on its default coordinates.
+             * This means that the game should end because the top row was reached. */
+            this.endGame();
+            return;
+        }
         this.nextblock = this.getBlock();
         this.drawBlock();
         this.drawNextBlock();

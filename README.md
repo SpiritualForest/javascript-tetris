@@ -11,4 +11,4 @@
 #### Pressing "Q" or Esc stops the game.
 #### Pressing ENTER will restart the game.
 
-#### It is now possible to specify the start level and height in the text boxes below the main grid canvas.
+#### It is possible to specify the start level and height in the text boxes below the main grid canvas.

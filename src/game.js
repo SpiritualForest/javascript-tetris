@@ -98,7 +98,7 @@ function handleInput(ev) {
         else if (keyCode == K_LEVELUP) {
             /* Allow the user to increase the level and drop speed */
             go.level++;
-            go.autoMoveMilliseconds -= 80;
+            go.autoMoveMilliseconds -= go.dropSpeedReduction;
             go.drawStats();
         }
     }
@@ -236,7 +236,7 @@ function clearLine(y) {
     /* Get the center x position on the grid */
     var decreasingCenterx = this.grid.width / 2 - 1;
     var increasingCenterx = decreasingCenterx + 1;
-    /* Now we loop until both x variables have reached the limits (0 and 9; the grid width is 10) */
+    /* Now we loop until both x variables have reached the limits (0 and 9 by default; the grid width is set to 10 squares by default) */
     var gameObject = this;
     var width = this.grid.width - 1;
     while((decreasingCenterx >= 0) && (increasingCenterx <= width)) {
@@ -283,9 +283,11 @@ function dropBlock() {
                 linecount++; // Only required for calculating the score multipliction
                 this.lines++;
                 if (this.lines % 10 === 0) {
-                    /* Increase the level after 10 lines and reduce the drop speed by 80 milliseconds. */
+                    /* Increase the level after 10 lines and reduce
+                     * the drop speed by the amount of milliseconds
+                     * set in the game object's dropSpeedReduction property. */
                     this.level++;
-                    this.autoMoveMilliseconds -= 80;
+                    this.autoMoveMilliseconds -= this.dropSpeedReduction;
                 }
             }
         }
@@ -303,13 +305,6 @@ function dropBlock() {
     /* Scoring based on grid cells soft dropped */
     this.score += ((y + squareSize) / squareSize) * ((this.randomizerHeight * 2) + 1);
     this.drawStats(); // Defined in graphics.js
-    /* Check for game ending */
-    if ("0" in grid.positions) {
-        /* top row reached. End the game.
-         * return true to indicate to autoMove() that the game should end. */
-        this.endGame();
-        return true;
-    }
 }
 
 function endGame() {
