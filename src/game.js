@@ -23,23 +23,22 @@ function handleInput(ev) {
 
     /* Handles input from keyboard and mouse */
     ev = ev || window.event;
+    
     var go = handleInput.gameObject;
-    if ((ev.type === "click") && (typeof go === "undefined")) {
-        /* Start the game by clicking on the canvas.
-         * We return afterwards because we don't respond to any further mouse events.
-         * At least not at this stage of development :P */
+    
+    if (ev.type === "click") {
+        /* Start or restart the game by clicking on the canvas.
+         * We return afterwards because we don't respond to any further mouse events. */
+        if (go !== undefined) { 
+            // Game is in progress. End it.
+            go.endGame();
+        }
         startGame(handleInput);
         return;
     }
     var keyCode = ev.keyCode;
     console.log("key code: " + keyCode);
-    if (keyCode === K_RESTART) {
-        /* Restart the game */
-        go.endGame();
-        startGame(handleInput);
-        return;
-    }
-    if ((typeof go !== "undefined") && (go.gameStarted)) {
+    if ((go !== undefined) && (go.gameStarted)) {
         if ((go.paused) && (FK_LIST.indexOf(keyCode) === -1)) {
             /* The pressed key was not found in the function keys list, and the game is paused.
              * Only the function keys can work when the game is paused. */
@@ -48,7 +47,7 @@ function handleInput(ev) {
         /* These ones can only work if the game is in progress */
         if ((D_LIST.indexOf(keyCode) !== -1) && (go.allowMovement)) {
             /* Movement keys. */
-            drop = go.moveBlock(keyCode);
+            var drop = go.moveBlock(keyCode);
             if (drop) {
                 /* If the user pressed the down key twice in a row and there was a collision, we drop the block */
                 go.softdrop++;
@@ -61,6 +60,10 @@ function handleInput(ev) {
                     go.softdrop = 0;
                 }
             }
+        }
+        else if (keyCode === K_RESTART) {
+            go.endGame();
+            startGame(handleInput);
         }
         else if (keyCode === K_HARDDROP) {
             /* Hard drop the block */
@@ -169,6 +172,7 @@ function isCollision(coordinates) {
     /* Checks whether the given coordinates collide with any other coordinates
      * that already exist in the grid, or whether they go off the grid altogether. */
     var grid = this.grid;
+    var gridWidthPixels = gridWidth * squareSize;
     for(let xy of coordinates) {
         var x = xy[0], y = xy[1];
         /* Check y first */
@@ -176,7 +180,7 @@ function isCollision(coordinates) {
             /* This one goes off limits. Abort operation */
             return true;
         }
-        if ((y in grid.positions) && (typeof grid.positions[y] !== "undefined")) {
+        if ((y in grid.positions) && (grid.positions[y] !== undefined)) {
             // Row exists; Check all x positions
             for(let xc of grid.positions[y]) {
                 if (x == xc[0]) {
@@ -185,9 +189,9 @@ function isCollision(coordinates) {
                 }
             }
         }
-        /* Here we multiply grid.width by squareSize because
+        /* Here we check x against the grid's width in pixels because
          * the width is represented in squares, whereas x is in pixels. */
-        if ((x < 0) || (x >= grid.width * squareSize)) {
+        if ((x < 0) || (x >= gridWidthPixels)) {
             /* Out of bounds */
             return true;
         }
@@ -217,7 +221,7 @@ function pushLines(max) {
     var step = 0;
     for(var i = max; i >= min; i -= squareSize) {
         var values = this.grid.positions[i];
-        if (typeof values === "undefined") {
+        if (values === undefined) {
             /* Empty line. Increase step by squareSize */
             step += squareSize;
         }
