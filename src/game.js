@@ -37,7 +37,6 @@ function handleInput(ev) {
         return;
     }
     var keyCode = ev.keyCode;
-    console.log("key code: " + keyCode);
     if ((go !== undefined) && (go.gameStarted)) {
         if ((go.paused) && (FK_LIST.indexOf(keyCode) === -1)) {
             /* The pressed key was not found in the function keys list, and the game is paused.
@@ -289,9 +288,12 @@ function dropBlock() {
                 if (this.lines % 10 === 0) {
                     /* Increase the level after 10 lines and reduce
                      * the drop speed by the amount of milliseconds
-                     * set in the game object's dropSpeedReduction property. */
+                     * set in the game object's dropSpeedReduction property.
+                     * (Only if it's still above the minimum limit) */
                     this.level++;
-                    this.autoMoveMilliseconds -= this.dropSpeedReduction;
+                    if (this.autoMoveMilliseconds > this.minAutoMoveMilliseconds) {
+                        this.autoMoveMilliseconds -= this.dropSpeedReduction;
+                    }
                 }
             }
         }

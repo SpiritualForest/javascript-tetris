@@ -56,12 +56,13 @@ function startGame(inputFunction) {
         lines: 0, // How many lines completed
         score: 0, // How many points
         level: isNaN(startlevel) ? 0 : startlevel, // Which level (drop speed).
-        autoMoveMilliseconds: 1000, // automove delay for setTimeout()
+        autoMoveMilliseconds: 172, // automove delay for setTimeout()
+        minAutoMoveMilliseconds: 80, // Lowest possible value autoMoveMilliseconds can have. Beyond this, no further reductions.
+        dropSpeedReduction: 92, // How many milliseconds to subtract from autoMoveMilliseconds when increasing a level
         previousLineCount: 1, // For calculating the score when lines are completed
         softdrop: 0, // For allowing the user to soft drop. Needs to press down-key twice.
         allowMovement: true, // Can the movement and rotation keys be used? This is only to avoid problems when redrawing the grid.
         randomizerHeight: isNaN(randomizerHeight) ? 0 : randomizerHeight, // For the block randomizer function
-        dropSpeedReduction: 65, // How many milliseconds to subtract from autoMoveMilliseconds when increasing a level
         /* Canvas contexts. We don't actively need all of them yet */
         gridCtx: gridCanvas.getContext("2d"),
         statsCtx: statsCanvas.getContext("2d"),
