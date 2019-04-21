@@ -57,8 +57,8 @@ function startGame(inputFunction) {
         score: 0, // How many points
         level: isNaN(startlevel) ? 0 : startlevel, // Which level (drop speed).
         autoMoveMilliseconds: 1000, // automove delay for setTimeout()
-        minAutoMoveMilliseconds: 80, // Lowest possible value autoMoveMilliseconds can have. Beyond this, no further reductions.
-        dropSpeedReduction: 92, // How many milliseconds to subtract from autoMoveMilliseconds when increasing a level
+        minAutoMoveMilliseconds: 100, // Lowest possible value autoMoveMilliseconds can have. Beyond this, no further reductions.
+        dropSpeedReduction: 50, // How many milliseconds to subtract from autoMoveMilliseconds when increasing a level
         previousLineCount: 1, // For calculating the score when lines are completed
         softdrop: 0, // For allowing the user to soft drop. Needs to press down-key twice.
         allowMovement: true, // Can the movement and rotation keys be used? This is only to avoid problems when redrawing the grid.
@@ -85,7 +85,15 @@ function startGame(inputFunction) {
     document.getElementById("gridheight").value = gameObject.randomizerHeight;
     document.getElementById("startlevel").value = gameObject.level;
     /* Set the automove milliseconds according to the start level */
-    gameObject.autoMoveMilliseconds -= gameObject.level * gameObject.dropSpeedReduction;
+    var reduction = gameObject.level * gameObject.dropSpeedReduction;
+    if (gameObject.autoMoveMilliseconds - reduction < gameObject.minAutoMoveMilliseconds) {
+        // Can't go below the minimum level. Reset.
+        gameObject.autoMoveMilliseconds = gameObject.minAutoMoveMilliseconds;
+    }
+    else { 
+        // Within limit
+        gameObject.autoMoveMilliseconds -= reduction;
+    }
     /* Clear the grid */
     gameObject.redrawGrid();
     /* Draw the current and blocks */

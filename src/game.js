@@ -99,9 +99,11 @@ function handleInput(ev) {
         }
         else if (keyCode == K_LEVELUP) {
             /* Allow the user to increase the level and drop speed */
-            go.level++;
-            go.autoMoveMilliseconds -= go.dropSpeedReduction;
-            go.drawStats();
+            if (go.autoMoveMilliseconds - go.dropSpeedReduction > go.minAutoMoveMilliseconds) {
+                go.level++;
+                go.autoMoveMilliseconds -= go.dropSpeedReduction;
+                go.drawStats();
+            }
         }
     }
 }
@@ -204,9 +206,7 @@ function isLineCompleted(y) {
     if (this.grid.positions[y].length === this.grid.width) {
         return true;
     }
-    else {
-        return false;
-    }
+    return false;
 }
 
 function pushLines(max) {
