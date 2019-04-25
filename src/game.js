@@ -14,37 +14,44 @@ var K_PAUSE = 80;   // P
 var K_QUIT = 27;    // Esc
 var K_QUIT2 = 81;   // Q
 var K_RESTART = 13; // Enter
-var FK_LIST = [K_PAUSE, K_QUIT, K_QUIT2, K_RESTART]; // Function-keys list.
 var K_LEVELUP = 76; // L
 var K_HARDDROP = 32; // Spacebar
+// Function keys list
+var FK_LIST = [K_PAUSE, K_QUIT, K_QUIT2, K_RESTART]
 
 function handleInput(ev) {
-    /* FIXME: REFACTOR THIS FUNCTION TO REDUCE REDUNDANCY AND IMPROVE PERFORMANCE!!! */
-
-    /* Handles input from keyboard and mouse */
+    /* Handles input from keyboard and mouse.
+     * Every key press and mouse click triggers this function. */
     ev = ev || window.event;
     
     var go = handleInput.gameObject;
     
     if (ev.type === "click") {
-        /* Start or restart the game by clicking on the canvas.
-         * We return afterwards because we don't respond to any further mouse events. */
+        /* Start or restart the game by clicking on the canvas */
         if (go !== undefined) { 
-            // Game is in progress. End it.
-            go.endGame();
+            /* Restart the game if it's not paused.
+             * A click while paused could be an indication that
+             * the canvas element lost focus, and the user is trying to refocus it,
+             * so that they can unpause and continue the game. */
+            if (!go.paused) {
+                go.endGame();
+                startGame(handleInput);
+            }
         }
-        startGame(handleInput);
-        return;
+        else { 
+            /* New game */
+            startGame(handleInput);
+        }
     }
     var keyCode = ev.keyCode;
     if ((go !== undefined) && (go.gameStarted)) {
-        if ((go.paused) && (FK_LIST.indexOf(keyCode) === -1)) {
+        if (go.paused && FK_LIST.indexOf(keyCode) === -1) {
             /* The pressed key was not found in the function keys list, and the game is paused.
              * Only the function keys can work when the game is paused. */
             return;
         }
         /* These ones can only work if the game is in progress */
-        if ((D_LIST.indexOf(keyCode) !== -1) && (go.allowMovement)) {
+        if (D_LIST.indexOf(keyCode) !== -1 && go.allowMovement) {
             /* Movement keys. */
             var drop = go.moveBlock(keyCode);
             if (drop) {
@@ -55,7 +62,7 @@ function handleInput(ev) {
                      * If we don't clear it first, there will be two active timers. */
                     go.dropBlock();
                     clearTimeout(go.autoMoveTimer);
-                    go.restartAutoMove(true);
+                    go.restartAutoMove(true); // passing true means it'll spawn a new block
                     go.softdrop = 0;
                 }
             }
