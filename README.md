@@ -1,5 +1,4 @@
-## The game is largely finished. Some code cleanup required, perhaps.
-## To test it out, simply run the canvas.html file.
+# Play [here!](https://spiritualforest.github.io/javascript-tetris "JavaScript Tetris")
 
 ### Click on the canvas to start the game.
 
