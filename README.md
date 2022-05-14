@@ -1,6 +1,6 @@
 # Play [here!](https://spiritualforest.github.io/javascript-tetris "JavaScript Tetris")
 
-### Click on the canvas to start the game.
+### Click on the canvas or press ENTER to start the game.
 
 #### Left, right, and down arrow keys move the block.
 #### Up arrow key rotates the block.

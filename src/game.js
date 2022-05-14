@@ -19,6 +19,16 @@ var K_HARDDROP = 32; // Spacebar
 // Function keys list
 var FK_LIST = [K_PAUSE, K_QUIT, K_QUIT2, K_RESTART]
 
+function handleDocumentInput(ev) {
+    if (ev.keyCode == K_RESTART) {
+        if ((handleInput.gameObject === undefined) || (!handleInput.gameObject.gameStarted)) {
+            // Start the game when the user presses Enter
+            gridCanvas.focus() // gridCanvas comes from graphics.js
+            startGame(handleInput)
+        }
+    }
+}
+
 function handleInput(ev) {
     /* Handles input from keyboard and mouse.
      * Every key press and mouse click triggers this function. */

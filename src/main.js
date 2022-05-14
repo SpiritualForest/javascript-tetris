@@ -139,10 +139,14 @@ function restartAutoMove(spawnNew) {
 function main() {
     /* Position the canvases */
     positionCanvases();
-    drawTextOnGrid("CLICK HERE", 20);
+    drawTextOnGrid("CLICK HERE OR PRESS ENTER", 10);
     /* Add an event listener for keyboard input */
+    // gridCanvas comes from graphics.js
     gridCanvas.addEventListener("keydown", handleInput);
     gridCanvas.addEventListener("click", handleInput);
+    // Add a keydown event function for the entire document
+    // purely to capture Enter key presses.
+    document.addEventListener("keydown", handleDocumentInput);
 }
 
 main();
